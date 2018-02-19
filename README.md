@@ -24,9 +24,9 @@ When a User do a request the bot sends the message to the staff group and then t
 This is not only the first bot in Python I do, it's also the first working, complex and totally new code that i write in Python, so it's my first work at all in the programming world  
 Said that I deeply apologize for all the horrible mistakes that I could do in this bot, for the bad translations, and the amount of meaningless names of definitions  
 
-Obviously I have to thanks all the fantastic people that helped me: starting from @matteb99, @fef0h, @pietroalbini (for his fantastic Botogram), codacademy and last but not least @frank1907 for making me curious about coding world   
+Obviously I have to thanks all the fantastic people that helped me: starting from @matteb99, @fef0h, @Frank1907, @pietroalbini (for his fantastic Botogram), codacademy and last but not least Francesco Palmas for the emotional assistance   
 
 builded with Botogram (https://github.com/pietroalbini/botogram)  
 
-Tell me about anything beacause i'm a noob
+Tell me about any issue, beacause i'm a noob and i need critics to grow up
 -
