@@ -15,7 +15,7 @@ d.execute('CREATE TABLE IF NOT EXISTS mess (mesid INTEGER, user INTEGER PRIMARY 
 dat.commit()
 # type=0(global admin bot) type=1(staff group) type2=(log channel) type=3(public group) type=4(channel)
 # stage=0(ready to do a request) stage=1(just typed /request) stage=2(gave the name of the request) stage=3(he have to confirm all) stage=4(examinating) stage=5(voting) stage=6(approved) stage=7(soddisfacted and to delete)
-bot.before_help = ['Welcome in the request Bot of @$channel']
+bot.before_help = ['Welcome to the Request Bot of @$channel']
 bot.after_help = ['Be sure to read the rules before requesting $something']
 bot.about = "This Bot helps you to request $something to the $channel"
 bot.owner = "@$yourusername & https://github.com/Mamiglia/Requester-Bot"
@@ -77,7 +77,7 @@ def verdict(userid, what):
 
 
 def checklink(lnk):
-    # this check the given link, you may not need this
+    # this checks the given link, you could not need this
     if "https://google.com/" in lnk:
         return True
     else:
@@ -162,7 +162,7 @@ def newadmin(chat, message):
     # remember to set your password
     if "$password" in message.text:
         d.execute("INSERT INTO ids (id, type) VALUES (?,?)", (message.sender.id, 0))
-        chat.send("Welcome at home my lord")
+        chat.send("Welcome home my lord")
         dat.commit()
     else:
         chat.send("Go away dirty peasant")
@@ -173,7 +173,7 @@ def staff(chat, message):
     if chat.type == "supergroup":
         if checkperm(message.sender.id):
             d.execute("INSERT INTO ids (id, type) VALUES (?,?)", (chat.id, 1))
-            chat.send("Staff Group correctly setted!")
+            chat.send("Staff Group correctly set!")
             dat.commit()
         else:
             chat.send("I need to receive the command from an important guy, not a console peasant as you")
@@ -186,7 +186,7 @@ def setgroup(chat, message):
     if chat.type == "supergroup":
         if checkperm(message.sender.id):
             d.execute("INSERT INTO ids (id, type) VALUES (?,?)", (chat.id, 3))
-            chat.send("Group correctly setted!")
+            chat.send("Group correctly set!")
             dat.commit()
         else:
             chat.send("I need to receive the command from an important guy, not a console peasant as you")
@@ -199,7 +199,7 @@ def setinfochannel(chat, message):
     if chat.type == "supergroup":
         if checkperm(message.sender.id):
             d.execute("INSERT INTO ids (id, type) VALUES (?,?)", (chat.id, 2))
-            chat.send("Log Channel correctly setted!")
+            chat.send("Log Channel correctly set!")
             dat.commit()
         else:
             chat.send("I need to receive the command from an important guy, not a console peasant as you")
@@ -265,7 +265,7 @@ def stager(chat, message):
                 except IndexError:
                     chat.send("The link is not correct!\nSend now the correct one")
             elif stage == 3:
-                chat.send('Do you wanna confirm the request or not?')
+                chat.send('Do you wanna confirm the request?')
             elif stage == 4:
                 chat.send('We are examinating your request')
             elif stage == 5:
