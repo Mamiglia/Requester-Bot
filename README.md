@@ -5,12 +5,12 @@ This bot let users to do requests to the admins of a channel
 
 FEATURES (not bugs):
 This bot is not a simple do-a-request bot, it allows admins to refuse, accept or vote a request by users
-Wait what?
+Wait what? 
 -
-When a User do a request the bot sends the message to the staff group and then the admins can decide:
--Refusing the request (maybe is too stupid, or whatever)\n
--Accepting a Request (maybe is really an intelligent request)\n
--Send the request to the public group of your channel, so the request will be voted by users
+When a User do a request the bot sends the message to the staff group and then the admins can decide: 
+-Refusing the request (maybe is too stupid, or whatever) 
+-Accepting a Request (maybe is really an intelligent request) 
+-Send the request to the public group of your channel, so the request will be voted by users 
 
 Complete (and quite simple) customization all the fields that have a '$' in them have to be customized (See definitions.md to learn more)
 Up to 2 different type of request
