@@ -27,3 +27,6 @@ Said that I deeply apologize for all the horrible mistakes that I could do in th
 Obviously I have to thanks all the fantastic people that helped me: starting from @matteb99, @fef0h, @pietroalbini (for his fantastic Botogram), codacademy and last but not least @frank1907 for making me curious about coding world   
 
 builded with Botogram (https://github.com/pietroalbini/botogram)  
+
+Tell me about anything beacause i'm a noob
+-
