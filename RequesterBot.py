@@ -14,7 +14,7 @@ d.execute("CREATE TABLE IF NOT EXISTS ids (id INTEGER PRIMARY KEY, type INTEGER)
 d.execute('CREATE TABLE IF NOT EXISTS mess (mesid INTEGER, user INTEGER PRIMARY KEY)')
 dat.commit()
 # type=0(global admin bot) type=1(staff group) type2=(log channel) type=3(public group) type=4(channel)
-# stage=0(ready to do a request) stage=1(just typed /request) stage=2(gave the name of the apk) stage=3(he have to confirm all) stage=4(examinating) stage=5(voting) stage=6(approved) stage=7(soddisfacted and to delete)
+# stage=0(ready to do a request) stage=1(just typed /request) stage=2(gave the name of the request) stage=3(he have to confirm all) stage=4(examinating) stage=5(voting) stage=6(approved) stage=7(soddisfacted and to delete)
 bot.before_help = ['Welcome in the request Bot of @$channel']
 bot.after_help = ['Be sure to read the rules before requesting $something']
 bot.about = "This Bot helps you to request $something to the $channel"
@@ -153,7 +153,7 @@ def hhh(message, chat):
 
 @bot.command("easteregg", hidden=True)
 def oliodipalmas(chat, message):
-    # Put at least one easter egg or you're dead to me
+    # $ Put at least one easter egg or you're dead to me
     chat.send('')
 
 
