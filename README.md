@@ -1,11 +1,11 @@
 # Requester-Bot
 Use for Telegram bots only  
 -
-This bot let users to do requests to the admins of a channel  
+This bot lets users to do requests to the admins of a channel  
 
 FEATURES (not bugs): 
 -  
->This bot is not a simple do-a-request bot, it allows admins to refuse, accept or vote a request by users  
+>This bot is not a common do-a-request bot, it allows admins to refuse, accept or vote a request by users  
 Wait, What?  
 When a User do a request the bot sends the message to the staff group and then the admins can decide:  
 -Refusing the request (maybe is too stupid, or whatever)  
