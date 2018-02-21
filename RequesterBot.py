@@ -35,6 +35,7 @@ elif req == 'x':
 else:
     print('the Bot isn\'t open to any request')
     door = 0
+global door
 
 
 def visualizer(ch):
@@ -125,7 +126,17 @@ def checkperm(i):
     else:
         return False
 
-
+@bot.command("cleanreq", hidden=True)
+def cleanreq(message, chat):
+    if checkperm(message.sender.id):
+        chat.send('CLeaning requests...')
+        d.execute("DROP TABLE IF EXISTS request")
+        d.execute("VACUUM")
+        d.execute("CREATE TABLE IF NOT EXISTS request (name TEXT, link TEXT, userid INTEGER PRIMARY KEY, username TEXT, nameuser TEXT, stage INTEGER DEFAULT 1, type TEXT, votes INTEGER DEFAULT 0, mesid INTEGER)")
+        chat.send('Done')
+        dat.commit()    
+    
+    
 @bot.command("cleanall", hidden=True)
 def cleanall(message, chat):
     if checkperm(message.sender.id):
