@@ -1,0 +1,89 @@
+{
+  "visualizer" : "Are you sure? Do you wanna request [%s](%s)?",
+  "staffvis" : [
+    "#%s\nThe user [%s](tg://user?id=%s) has requested:\n%s\n%s",
+    "#%s\nThe user @%s has requested:\n%s\n%s"
+  ],
+  "verdict" : [
+    "The request of the user [%s](tg://user?id=%s) has been accepted:\n[%s](%s)",
+    "The request of the user [%s](tg://user?id=%s) has been refused:\n[%s](%s)",
+    "The request of the user [%s](tg://user?id=%s) is being voted:\n[%s](%s)"
+  ],
+  "knowit" : [
+    "Type /request or /$request2 to start",
+    "Sorry, but at the moment the requests are closed"
+  ],
+  "checkreq" : [
+    "You have already requested something, wait until that request is solved",
+    "Sorry, but at the moment request are closed"
+  ],
+  "start" : "%s, Welcome to the Request Bot of @$channel, Be sure to read the rules (/rules) before requesting $something",
+  "help" : "This Bot helps you to request $something to the $channel\nThese commands may help you:\n/rules - FOLLOW THE RULES\n/request - Make your Request!\n/request2 - Make a different type of request\n\nIf you have any trouble: @$yourusername & https://github.com/Mamiglia/Requester-Bot",
+  "rules" : "SPECIFIC RULES $$",
+  "easteregg" : "$",
+  "request" : [
+    "Cancel",
+    "Send me the name of your $request",
+    "Send me the name of your $request2"
+  ],
+  "stager" : {
+      "1" : [
+        "Name received",
+        "Back",
+        "There isn't any link",
+        "Now send me the link"
+      ],
+      "2" : [
+        "Link received",
+        "Back",
+        "Cancel",
+        "Confirm",
+        "The link is not correct!\nSend now the correct one"
+      ],
+      "3" : [
+        "Do you wanna confirm the request?"
+      ],
+      "4" : [
+        "We are examinating your request"
+      ],
+      "5" : [
+        "At the moment your request is being voted on @$yourpublicgroup"
+      ],
+      "6" : [
+        "Your request has been approved, give us the time to publish it!"
+      ],
+      "err" : [
+        "GREAT, A BUG"
+      ]
+  },
+  "rename" : "Send me the name!",
+  "relink" : "Send me the link!",
+  "void" : "Ok, so there aren't any links, send me another message to complete your request",
+  "zero" : "Request cancelled",
+  "zero2" : "Request Published!",
+  "confirm" : [
+    "Refuse",
+    "Accept",
+    "VOTE",
+    "Your request is being examinated"
+  ],
+  "refuse" : "Your request has been refused by the admins$",
+  "vote" : "Your request is being voted on @$yourpublicgroup",
+  "good" : [
+    "Your request has been approved, we will soon (but not too soon) publish it",
+    "Published"
+  ],
+  "op" : [
+    "The people have talked, We want this request!",
+    "...this request is more negative than my bank accont...",
+    "Vote Added!",
+    "You have already voted"
+  ],
+  "qtvis" : "#%s\nIn the opinion of [%s](tg://user?id=%s) will be really interesting if this $request would be published on the channel:\n[%s](%s)\nWhat do you think?\nVotes: %s",
+  "values" : {
+    "token" : "YOUR_API_KEY$$",
+    "password" : "YOURPASSWORD$$",
+    "link" : "https://google.com/",
+    "request2" : "Request2 type$"
+  }
+}
