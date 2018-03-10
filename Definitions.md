@@ -6,7 +6,7 @@ type2 = log channel
 type3 = public group  
 type4 = channel  
 
-Set a new admin by typing "/newadmin YOURPASSWORD" (set a password in the langEN.json file at line 84)
+Set a new admin by typing "/newadmin YOURPASSWORD" (set a password in the lang.json file at line 84)
 -
 
 The bots divide the request action in different stages:  
@@ -19,5 +19,5 @@ stage5 = voting in public group
 stage6 = approved   
 stage7 = soddisfacted and to delete (never used)  
 
-REMEMBER TO MODIFY ALL '$' ELEMENTS also in langEN.json
+REMEMBER TO MODIFY ALL '$' ELEMENTS also in lang.json
 - 
