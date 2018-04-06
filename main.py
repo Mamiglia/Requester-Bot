@@ -39,6 +39,8 @@ else:
     print('the Bot isn\'t open to any request')
     door = 0
 
+tak = 20
+global tak
 
 def checkreq(prim, typ):
     if door > 0:
@@ -68,29 +70,40 @@ def rules(chat, message):
     chat.send(p["rules"])
 
 
-@bot.command('adminhelp')
+@bot.command('adminhelp', hidden=True)
 def adminhelp(message, chat):
     if checkperm(message.sender.id):
         chat.send("these are the commands that only an admin can perform:\
 -/delete @username: delete the user's request\
 -/cleanreq : delete all the requests\
 -/door : change the number of requests that the bot can have\
+-/resizevotes : resize the number of votes that a request needs to have to be accepted\
 -/newadmin Your_password : set you as a new admin\
 -/setstaff : type in the staff group to set the staff group\
 -/setgroup : type in your group to set it\
 -/setlogchannel : type in your log group to set it")
 
         
-@bot.command("delete")
+@bot.command("delete", hidden=True)
 def deletereq(message, chat):
     if checkperm(message.sender.id):
         username = message.text[8::]
         d.execute("DELETE FROM request WHERE username=?", (username, ))
         dat.commit()
         chat.send("Deleted >:c")
-        #add a check feature
+        #add a check feature in future
 
+        
+@bot.command("resizevotes", hidden=True)
+def resizevotes(message, chat):
+    if checkperm(message.sender.id):
+        try:
+            tak = int(message.text[12::])
+            chat.send("Votes needed for a request to be approved resized to %s" % (tak))
+        except ValueError:
+            chat.send("Insert a valid number!")
 
+            
 @bot.command("cleanreq", hidden=True)
 def cleanreq(message, chat):
     if checkperm(message.sender.id):
@@ -356,11 +369,11 @@ def operation(chat, message, query, data):
         vote = ex[0] + int(data)
         userid = ex[1]
         # set how many votes are needed for the request to be approved$
-        if vote == 20:
+        if vote == tak:
             d.execute('DELETE FROM mess WHERE mesid=?', (message.message_id, ))
             good(chat, message, userid)
             message.edit(p["op"][0])
-        elif vote == -20:
+        elif vote == -tak:
             message.edit(p["op"][1])
             zero(chat, message, userid)
             d.execute('DELETE FROM mess WHERE mesid=?', (message.message_id, ))
