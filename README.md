@@ -20,7 +20,7 @@ When a User makes a request the bot sends the message to the staff group and the
 
 >Not an heavy bot  
 
-these are the commands that only an admin can perform:  
+These are the commands that only an admin can perform:  
 -/delete @username: delete the user's request  
 -/cleanreq : delete all the requests  
 -/cleanall : delete all the datas, use it only if really necessary  
