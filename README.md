@@ -28,7 +28,8 @@ These are the commands that only an admin can perform:
 -/resizevotes N : resize the number of votes that a request needs to have to be accepted  
 -/newadmin Your_password : set you as a new admin  
 -/setstaff : type in the staff group to set the staff group  
--/setgroup : type in your group to set it-/setlogchannel : type in your log group to set it
+-/setgroup : type in your group to set it  
+-/setlogchannel : type in your log group to set it
 
 
 This is not only the first bot in Python I do, but it's also the first working, complex and totally new code that i write in Python, so it's my first work at all in the programming world  
