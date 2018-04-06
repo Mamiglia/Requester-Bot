@@ -68,6 +68,19 @@ def rules(chat, message):
     chat.send(p["rules"])
 
 
+@bot.command('adminhelp')
+def adminhelp(message, chat):
+    if checkperm(message.sender.id):
+        chat.send("these are the commands that only an admin can perform:\
+-/delete @username: delete the user's request\
+-/cleanreq : delete all the requests\
+-/door : change the number of requests that the bot can have\
+-/newadmin Your_password : set you as a new admin\
+-/setstaff : type in the staff group to set the staff group\
+-/setgroup : type in your group to set it\
+-/setlogchannel : type in your log group to set it")
+
+        
 @bot.command("cleanreq", hidden=True)
 def cleanreq(message, chat):
     if checkperm(message.sender.id):
