@@ -19,7 +19,7 @@
   ],
   "start" : "%s, Welcome to the Request Bot of @$channel, Be sure to read the rules (/rules) before requesting $something",
   "help" : "This Bot helps you to request $something to the $channel\nThese commands may help you:\n/rules - FOLLOW THE RULES\n/request - Make your Request!\n/request2 - Make a different type of request\n\nIf you have any trouble: @$yourusername & https://github.com/Mamiglia/Requester-Bot",
-  "rules" : "SPECIFIC RULES $$",
+  "rules" : "INSERT HERE YOUR SPECIFIC RULES $$",
   "easteregg" : "$",
   "request" : [
     "Cancel",
@@ -29,15 +29,15 @@
   "stager" : {
       "1" : [
         "Name received",
-        "Back",
-        "There isn't any link",
+        "Back ⬅️",
+        "There isn't any link 🔗",
         "Now send me the link"
       ],
       "2" : [
         "Link received",
-        "Back",
-        "Cancel",
-        "Confirm",
+        "Back ⬅️",
+        "Cancel ❌",
+        "Confirm ✅",
         "The link is not correct!\nSend now the correct one"
       ],
       "3" : [
@@ -62,9 +62,9 @@
   "zero" : "Request cancelled",
   "zero2" : "Request Published!",
   "confirm" : [
-    "Refuse",
-    "Accept",
-    "VOTE",
+    "Refuse ❌",
+    "Accept ✅",
+    "VOTE ⚖️",
     "Your request is being examinated"
   ],
   "refuse" : "Your request has been refused by the admins$",
@@ -83,7 +83,7 @@
   "values" : {
     "token" : "YOUR_API_KEY$$",
     "password" : "YOURPASSWORD$$",
-    "link" : "https://google.com/",
+    "link" : "https://",
     "request2" : "Request2 type$"
   }
 }
