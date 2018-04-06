@@ -39,8 +39,9 @@ else:
     print('the Bot isn\'t open to any request')
     door = 0
 
-tak = 20
 global tak
+tak = 20
+
 
 def checkreq(prim, typ):
     if door > 0:
@@ -73,37 +74,42 @@ def rules(chat, message):
 @bot.command('adminhelp', hidden=True)
 def adminhelp(message, chat):
     if checkperm(message.sender.id):
-        chat.send("these are the commands that only an admin can perform:\
--/delete @username: delete the user's request\
--/cleanreq : delete all the requests\
--/door : change the number of requests that the bot can have\
--/resizevotes : resize the number of votes that a request needs to have to be accepted\
--/newadmin Your_password : set you as a new admin\
--/setstaff : type in the staff group to set the staff group\
--/setgroup : type in your group to set it\
+        chat.send("These are the commands that only an admin can perform:\n\
+-/delete @username: delete the user's request\n\
+-/cleanreq : delete all the requests\n\
+-/door : change the number of requests that the bot can have\n\
+-/resizevotes : resize the number of votes that a request needs to have to be accepted\n\
+-/newadmin Your_password : set you as a new admin\n\
+-/setstaff : type in the staff group to set the staff group\n\
+-/setgroup : type in your group to set it\n\
 -/setlogchannel : type in your log group to set it")
 
-        
+
 @bot.command("delete", hidden=True)
 def deletereq(message, chat):
     if checkperm(message.sender.id):
-        username = message.text[8::]
-        d.execute("DELETE FROM request WHERE username=?", (username, ))
-        dat.commit()
-        chat.send("Deleted >:c")
-        #add a check feature in future
+        username = message.text[9::].lower()
+        d.execute("SELECT name FROM request WHERE username=?", (username, ))
+        b = d.fetchone()
+        if b is not None:
+            d.execute("DELETE FROM request WHERE username=?", (username, ))
+            dat.commit()
+            chat.send("Deleted >:c")
+        else:
+            chat.send("Invalid Username")
 
-        
+
 @bot.command("resizevotes", hidden=True)
 def resizevotes(message, chat):
     if checkperm(message.sender.id):
         try:
+            global tak
             tak = int(message.text[12::])
-            chat.send("Votes needed for a request to be approved resized to %s" % (tak))
+            chat.send("Votes that a request needs to be approved are now %s" % (tak))
         except ValueError:
             chat.send("Insert a valid number!")
 
-            
+
 @bot.command("cleanreq", hidden=True)
 def cleanreq(message, chat):
     if checkperm(message.sender.id):
@@ -118,7 +124,7 @@ def cleanreq(message, chat):
 
 
 @bot.command("cleanall", hidden=True)
-def ooo(message, chat):
+def cleanall(message, chat):
     if checkperm(message.sender.id):
         chat.send('cleaning..')
         d.execute("DROP TABLE IF EXISTS request")
@@ -133,9 +139,10 @@ def ooo(message, chat):
 
 
 @bot.command("door", hidden=True)
-def hhh(message, chat):
+def changereqnum(message, chat):
     if checkperm(message.sender.id):
         try:
+            global door
             door = int(message.text[5::])
             chat.send('Now I\'m open to %s requests' % (door))
         except ValueError:
@@ -154,6 +161,7 @@ def newadmin(chat, message):
     if p["values"]["password"] in message.text:
         d.execute("INSERT INTO ids (id, type) VALUES (?,?)", (message.sender.id, 0))
         chat.send("W-welcome home S-Senpai!")
+        chat.send("You already know what you wnat to do with me, right?\nIn any case, if you don't have any idea check it here /adminhelp")
         dat.commit()
     else:
         chat.send("Who is this CONSOLE-PEASANT??")
@@ -244,7 +252,7 @@ def stager(chat, message):
                         res = True
                     if res:
                         bt = botogram.Buttons()
-                        d.execute("UPDATE request SET link=?, username=?, nameuser=?, userid=?, stage=3 WHERE userid=?", (applink, message.sender.username, message.sender.name, message.sender.id, chat.id))
+                        d.execute("UPDATE request SET link=?, username=?, nameuser=?, userid=?, stage=3 WHERE userid=?", (applink, (message.sender.username).lower(), message.sender.name, message.sender.id, chat.id))
                         bt[0].callback(p["stager"]["2"][1], "relink", str(message.sender.id))
                         bt[1].callback(p["stager"]["2"][2], "zero", str(message.sender.id))
                         bt[1].callback(p["stager"]["2"][3], 'confirm', str(message.sender.id))
