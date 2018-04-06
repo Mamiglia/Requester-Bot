@@ -81,6 +81,16 @@ def adminhelp(message, chat):
 -/setlogchannel : type in your log group to set it")
 
         
+@bot.command("delete")
+def deletereq(message, chat):
+    if checkperm(message.sender.id):
+        username = message.text[8::]
+        d.execute("DELETE FROM request WHERE username=?", (username, ))
+        dat.commit()
+        chat.send("Deleted >:c")
+        #add a check feature
+
+
 @bot.command("cleanreq", hidden=True)
 def cleanreq(message, chat):
     if checkperm(message.sender.id):
