@@ -24,8 +24,8 @@ These are the commands that only an admin can perform:
 -/delete @username: delete the user's request  
 -/cleanreq : delete all the requests  
 -/cleanall : delete all the datas, use it only if really necessary  
--/door : change the number of requests that the bot can have  
--/resizevotes : resize the number of votes that a request needs to have to be accepted  
+-/door N : change the number of requests that the bot can have  
+-/resizevotes N : resize the number of votes that a request needs to have to be accepted  
 -/newadmin Your_password : set you as a new admin  
 -/setstaff : type in the staff group to set the staff group  
 -/setgroup : type in your group to set it-/setlogchannel : type in your log group to set it
