@@ -5,6 +5,7 @@ d = dat.cursor()
 
 
 def checklink(lnk):
+    '''Check if the link is valid, set your specific link if needed (data/lang.json)'''
     if p["values"]["link"] in lnk:
         return True
     else:
@@ -12,6 +13,7 @@ def checklink(lnk):
 
 
 def check2(userlist, usr):
+    '''Check if the user is in a list of users, useful to know if that user alreday make a request'''
     for row in userlist:
         if usr in row:
             return False
@@ -21,6 +23,7 @@ def check2(userlist, usr):
 
 
 def knowit(r):
+    '''check if requests are open'''
     if r > 0:
         return p["knowit"][0]
     elif r <= 0:
@@ -28,6 +31,7 @@ def knowit(r):
 
 
 def checkperm(i):
+    '''Check if the user is in the admins list'''
     d.execute("SELECT id FROM ids WHERE type=0")
     admins = d.fetchall()
     for adm in admins:
@@ -36,3 +40,4 @@ def checkperm(i):
             break
     else:
         return False
+
