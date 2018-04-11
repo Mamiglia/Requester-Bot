@@ -1,5 +1,5 @@
 # IMPORTANT: CHANGE ALL ELEMENTS WITH '$'
-# REMEMBER THAT YOU HAVE TO CHANGE ALSO THE JSON FILE 
+# REMEMBER THAT YOU HAVE TO CHANGE ALSO THE JSON FILE
 # Set your password, Set your Api token
 
 
@@ -75,7 +75,7 @@ def start(chat, message):
 
 @bot.command('help')
 def help(chat, message):
-    '''Instructions: How do I make a request?''''
+    '''Instructions: How do I make a request?'''
     chat.send(p["help"])
 
 
@@ -134,7 +134,7 @@ def resizevotes(message, chat):
         try:
             global votes
             votes = int(message.text[12::])
-            chat.send("Votes that a request needs to be approved are now %s" % (tak))
+            chat.send("Votes that a request needs to be approved are now %s" % (votes))
         except ValueError:
             chat.send("Insert a valid number!")
 
@@ -304,8 +304,8 @@ def stager(chat, message):
 
 
 @bot.callback("rename")
-'''rename the the request'''
 def rename(chat, message):
+    '''rename the the request'''
     d.execute("UPDATE request SET stage=1 WHERE userid=?", (chat.id, ))
     dat.commit()
     chat.send(p["rename"])
@@ -403,7 +403,6 @@ def good(chat, message, data):
 
 @bot.callback('op')
 def operation(chat, message, query, data):
-    
     d.execute('SELECT user FROM mess WHERE mesid=?', (message.message_id, ))
     users = d.fetchall()
     if users == [] or check2(users, query.sender.id):
