@@ -5,6 +5,7 @@ d = dat.cursor()
 
 
 def visualizer(ch):
+    '''the message that will be sent to the user with a recap of what he requested'''
     d.execute("SELECT * FROM request WHERE userid=?", [ch.id])
     ex = d.fetchone()
     name = ex[0]
@@ -14,6 +15,7 @@ def visualizer(ch):
 
 
 def staffvis(userid):
+    '''the message that will be sent to the staff group, it will include the name, and the id of the user'''
     d.execute("SELECT * FROM request WHERE userid=?", (int(userid), ))
     ex = d.fetchone()
     name = ex[0]
@@ -29,6 +31,7 @@ def staffvis(userid):
 
 
 def verdict(userid, what):
+    '''message that will be sent to the user to let him know wheter his request has been accepted'''
     d.execute("SELECT * FROM request WHERE userid=?", (userid, ))
     ex = d.fetchone()
     name = ex[0]
