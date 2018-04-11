@@ -5,9 +5,9 @@ This bot lets users to makes requests to the admins of a channel, especially it'
 
 FEATURES: 
 -  
-* This bot is not a common make-a-request bot, it allows admins to refuse, accept or vote a request by users  
+This bot is not a common make-a-request bot, it allows admins to refuse, accept or vote a request by users.  
 __Wait, What?__  
-When a User makes a request the bot sends the message to the staff group and then the admins can decide:  
+* When a User makes a request the bot sends the message to the staff group and then the admins can decide:  
   * Refusing the request (maybe is a request too stupid, or whatever)  
   * Accepting a Request (maybe is really an intelligent request)  
   * _Send the request to the public group of your channel, so the request will be voted by users_  
