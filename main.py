@@ -146,7 +146,9 @@ def cleanreq(message, chat):
         chat.send('cleaning..')
         d.execute("DROP TABLE IF EXISTS request")
         d.execute("DROP TABLE IF EXISTS mess")
+        d.isolation_level = None
         d.execute("VACUUM")
+        d.isolation_level = ""
         d.execute("CREATE TABLE IF NOT EXISTS request (name TEXT, link TEXT, userid INTEGER PRIMARY KEY, username TEXT, nameuser TEXT, stage INTEGER DEFAULT 1, type TEXT, votes INTEGER DEFAULT 0, mesid INTEGER)")
         d.execute('CREATE TABLE IF NOT EXISTS mess (mesid INTEGER, user INTEGER PRIMARY KEY)')
         chat.send('Done!')
@@ -161,7 +163,9 @@ def cleanall(message, chat):
         d.execute("DROP TABLE IF EXISTS request")
         d.execute("DROP TABLE IF EXISTS mess")
         d.execute("DROP TABLE IF EXISTS ids")
+        d.isolation_level = None
         d.execute("VACUUM")
+        d.isolation_level = ""
         d.execute("CREATE TABLE IF NOT EXISTS request (name TEXT, link TEXT, userid INTEGER PRIMARY KEY, username TEXT, nameuser TEXT, stage INTEGER DEFAULT 1, type TEXT, votes INTEGER DEFAULT 0, mesid INTEGER)")
         d.execute("CREATE TABLE IF NOT EXISTS ids (id INTEGER PRIMARY KEY, type INTEGER)")
         d.execute('CREATE TABLE IF NOT EXISTS mess (mesid INTEGER, user INTEGER PRIMARY KEY)')
