@@ -11,11 +11,13 @@
   ],
   "knowit" : [
     "Type /request or /$request2 to start",
-    "Sorry, but at the moment the requests are closed"
+    "Sorry, but at the moment the requests are closed",
+    "You have been forbidden from this bot, due to your misconduct behaviour, BEHOLD"
   ],
   "checkreq" : [
     "You have already requested something, wait until that request is solved",
-    "Sorry, but at the moment request are closed"
+    "Sorry, but at the moment request are closed",
+    "You have been forbidden from this bot, due to your misconduct behaviour, BEHOLD"
   ],
   "start" : "%s, Welcome to the Request Bot of @$channel, Be sure to read the rules (/rules) before requesting $something",
   "help" : "This Bot helps you to request $something to the $channel\nThese commands may help you:\n/rules - FOLLOW THE RULES\n/request - Make your Request!\n/request2 - Make a different type of request\n\nIf you have any trouble: @$yourusername & https://github.com/Mamiglia/Requester-Bot",
@@ -25,6 +27,11 @@
     "Cancel",
     "Send me the name of your $request",
     "Send me the name of your $request2"
+  ],
+  "deletemine" : [
+    "You don't have any active request in this moment, press /request to start one",
+    "Too Late, your request have been already approved",
+    "Request succesfully canceled"
   ],
   "stager" : {
       "1" : [
@@ -39,6 +46,7 @@
         "Cancel ❌",
         "Confirm ✅",
         "The link is not correct!\nSend now the correct one"
+        "Understand, no link"
       ],
       "3" : [
         "Do you wanna confirm the request?"
@@ -54,11 +62,13 @@
       ],
       "err" : [
         "GREAT, A BUG"
+      ],
+      "0" : [
+        "Do you feel your sins crawling on your back? You have been banned, from this bot\n__PENITENZIAGITE__"
       ]
   },
   "rename" : "Send me the name!",
   "relink" : "Send me the link!",
-  "void" : "Ok, so there aren't any links, send me another message to complete your request",
   "zero" : "Request cancelled",
   "zero2" : "Request Published!",
   "confirm" : [
@@ -67,6 +77,7 @@
     "VOTE ⚖️",
     "Your request is being examinated"
   ],
+  "alreadydel" : "The request have been already deleted by the user",
   "refuse" : "Your request has been refused by the admins$",
   "vote" : "Your request is being voted on @$yourpublicgroup",
   "good" : [
