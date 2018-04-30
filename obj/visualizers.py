@@ -1,6 +1,6 @@
 import sqlite3
 from .jsonr import p
-dat = sqlite3.connect('data/dat1.db', timeout=0)
+dat = sqlite3.connect('data/dat1.db')
 d = dat.cursor()
 
 
@@ -20,13 +20,9 @@ def staffvis(userid):
     ex = d.fetchone()
     name = ex[0]
     lnk = ex[1]
-    username = ex[3]
     nameuser = ex[4]
     ur = ex[6]
-    if username is None:
-        tosend = (p["staffvis"][0] % (ur, nameuser, userid, name, lnk))
-    else:
-        tosend = (p["staffvis"][1] % (ur, username, name, lnk))
+    tosend = (p["staffvis"][0] % (ur, nameuser, userid, name, lnk))
     return tosend
 
 
