@@ -357,7 +357,7 @@ def stager(chat, message):
                     if d.fetchone()[0] is None:
                         applink = str(message.parsed_text.filter("link")[0])
                         res = checklink(applink)
-                        bot.edit_message(chat, int(message.message_id - 1), 'p["stager"]["1"][3]')
+                        bot.edit_message(chat, int(message.message_id - 1), p["stager"]["1"][3])
                     else:
                         applink = 'No link'
                         res = True
