@@ -13,7 +13,7 @@ from obj.checks import checklink, check2, knowit, checkperm
 bot = botogram.create(p["values"]["token"])
 # Set your api token in the json file (data/lang.json)$
 
-dat = sqlite3.connect('data/dat1.db', timeout=10)
+dat = sqlite3.connect('data/dat1.db')
 d = dat.cursor()
 d.execute("CREATE TABLE IF NOT EXISTS request (name TEXT, link TEXT, userid INTEGER PRIMARY KEY, username TEXT, nameuser TEXT, stage INTEGER DEFAULT 1, type TEXT, votes INTEGER DEFAULT 0, mesid INTEGER)")
 # core database of the bot, it has in it allazs the requests and useful informations
@@ -94,10 +94,13 @@ def rules(chat, message):
 def newadmin(chat, message):
     '''Insert a new admin in the admins list, remember to set your password in lang.json $$'''
     if p["values"]["password"] in message.text:
-        d.execute("INSERT INTO ids (id, type) VALUES (?,?)", (message.sender.id, 0))
-        chat.send("W-welcome home S-Senpai!")
-        chat.send("You already know what you wnat to do with me, right?\nIn any case, if you don't have any idea check it here /adminhelp")
-        dat.commit()
+        try:
+            d.execute("INSERT INTO ids (id, type) VALUES (?,?)", (message.sender.id, 0))
+            chat.send("W-welcome home S-Senpai!")
+            chat.send("You already know what you what to do with me, right?\nIn any case, if you don't have any idea check it here /adminhelp")
+            dat.commit()
+        except sqlite3.IntegrityError:
+            chat.send("You are already an admin UwU, you can't become more admin than this")
     else:
         chat.send("Who is this CONSOLE-PEASANT??")
 
@@ -114,7 +117,9 @@ def adminhelp(message, chat):
 -/newadmin Your_password : set you as a new admin\n\
 -/setstaff : type in the staff group to set the staff group\n\
 -/setgroup : type in your group to set it\n\
--/setlogchannel : type in your log group to set it")
+-/setlogchannel : type in your log group to set it\n\
+-/block : block an user, first send this command, and then forward a message of the user\n\
+-/unblock : a list of the blocked users, click one to unblock\n")
 
 
 @bot.command("delete", hidden=True)
@@ -504,7 +509,7 @@ def groupvote(chat, message, data):
         else:
             message.edit("Already in another Stage baby")
     except TypeError:
-        message.edit(p["alreadydel"][0])
+        message.edit(p["alreadydel"])
 
 
 @bot.callback("good")
@@ -526,7 +531,7 @@ def good(chat, message, data):
         else:
             message.edit("Already in another Stage baby")
     except TypeError:
-        message.edit(p["alreadydel"][0])
+        message.edit(p["alreadydel"])
 
 
 @bot.callback('op')
@@ -600,3 +605,4 @@ if __name__ == "__main__":
     bot.run()
 
 # excel
+
