@@ -1,6 +1,6 @@
 import sqlite3
 from .jsonr import p
-dat = sqlite3.connect('data/dat1.db', timeout=0)
+dat = sqlite3.connect('data/dat1.db')
 d = dat.cursor()
 
 
@@ -13,7 +13,7 @@ def checklink(lnk):
 
 
 def check2(userlist, usr):
-    '''Check if the user is in a list of users, useful to know if that user alreday make a request'''
+    '''Check if the user is in a list of users, useful to know if that user alreday made a request'''
     for row in userlist:
         if usr in row:
             return False
@@ -40,4 +40,3 @@ def checkperm(i):
             break
     else:
         return False
-
