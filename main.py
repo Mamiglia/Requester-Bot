@@ -1,3 +1,4 @@
+'''CODE UNDER APACHE 2.0 LICENSE'''
 # IMPORTANT: CHANGE ALL ELEMENTS WITH '$'
 # REMEMBER THAT YOU HAVE TO CHANGE ALSO THE JSON FILE
 # Set your password, Set your Api token
@@ -12,16 +13,16 @@ from obj.checks import checklink, check2, knowit, checkperm
 bot = botogram.create(p["values"]["token"])
 # Set your api token in the json file (data/lang.json)$
 
-dat = sqlite3.connect('data/dat1.db', timeout=0)
+dat = sqlite3.connect('data/dat1.db', timeout=10)
 d = dat.cursor()
 d.execute("CREATE TABLE IF NOT EXISTS request (name TEXT, link TEXT, userid INTEGER PRIMARY KEY, username TEXT, nameuser TEXT, stage INTEGER DEFAULT 1, type TEXT, votes INTEGER DEFAULT 0, mesid INTEGER)")
-# core database of the bot, it has in it all the requests and useful informations
-# stage=0(ready to do a request) stage=1(just typed /request) stage=2(gave the name of the apk) stage=3(he have to confirm all) stage=4(examinating) stage=5(voting) stage=6(approved) stage=7(soddisfacted and to delete)
-
+# core database of the bot, it has in it allazs the requests and useful informations
+# stage=0(ready to do a request) stage=1(just typed /request) stage=2(gave the name of the apk) stage=3(he have to confirm all) stage=4(examinating) stage=5(voting) stage=6(approved) stage=7(soddisfacted and to delete) stage=13(BANNED)
+dat.commit()
 d.execute("CREATE TABLE IF NOT EXISTS ids (id INTEGER PRIMARY KEY, type INTEGER)")
 # database that stores in it all the ids, the admins, the groups
 # type=0(global admin bot) type=1(staff group) type=2(log channel) type=3(public group) type=4(channel)
-
+dat.commit()
 d.execute('CREATE TABLE IF NOT EXISTS mess (mesid INTEGER, user INTEGER PRIMARY KEY)')
 # database useful to check who already voted the poll
 dat.commit()
@@ -50,21 +51,25 @@ else:
 
 global votes
 votes = 20
-# set the votes that a request need to be approved $
+# set the votes that a request needs to be approved $
 
 
-def checkreq(prim, typ):
+def checkreq(cht, typ):
     '''Check if the user can make a request, the users can have only one request at time'''
     if door > 0:
         try:
-            d.execute("INSERT INTO request (userid, type) VALUES (?,?)", (prim.id, typ))
+            d.execute("INSERT INTO request (userid, type) VALUES (?,?)", (cht.id, typ))
             dat.commit()
             return True
         except sqlite3.IntegrityError:
-            prim.send(p["checkreq"][0])
-            return False
+            d.execute("SELECT stage FROM request WHERE userid=?", (cht.id, ))
+            if d.fetchone()[0] == 0:
+                cht.send(p["checkreq"][2])
+            else:
+                cht.send(p["checkreq"][0])
     else:
-        prim.send(p["checkreq"][1])
+        cht.send(p["checkreq"][1])
+    return False
 
 
 @bot.command('start')
@@ -145,11 +150,13 @@ def cleanreq(message, chat):
     if checkperm(message.sender.id):
         chat.send('cleaning..')
         d.execute("DROP TABLE IF EXISTS request")
+        dat.commit()
         d.execute("DROP TABLE IF EXISTS mess")
-        d.isolation_level = None
+        dat.commit()
         d.execute("VACUUM")
-        d.isolation_level = ""
+        dat.commit()
         d.execute("CREATE TABLE IF NOT EXISTS request (name TEXT, link TEXT, userid INTEGER PRIMARY KEY, username TEXT, nameuser TEXT, stage INTEGER DEFAULT 1, type TEXT, votes INTEGER DEFAULT 0, mesid INTEGER)")
+        dat.commit()
         d.execute('CREATE TABLE IF NOT EXISTS mess (mesid INTEGER, user INTEGER PRIMARY KEY)')
         chat.send('Done!')
         dat.commit()
@@ -161,13 +168,16 @@ def cleanall(message, chat):
     if checkperm(message.sender.id):
         chat.send('cleaning..')
         d.execute("DROP TABLE IF EXISTS request")
+        dat.commit()
         d.execute("DROP TABLE IF EXISTS mess")
+        dat.commit()
         d.execute("DROP TABLE IF EXISTS ids")
-        d.isolation_level = None
+        dat.commit()
         d.execute("VACUUM")
-        d.isolation_level = ""
         d.execute("CREATE TABLE IF NOT EXISTS request (name TEXT, link TEXT, userid INTEGER PRIMARY KEY, username TEXT, nameuser TEXT, stage INTEGER DEFAULT 1, type TEXT, votes INTEGER DEFAULT 0, mesid INTEGER)")
+        dat.commit()
         d.execute("CREATE TABLE IF NOT EXISTS ids (id INTEGER PRIMARY KEY, type INTEGER)")
+        dat.commit()
         d.execute('CREATE TABLE IF NOT EXISTS mess (mesid INTEGER, user INTEGER PRIMARY KEY)')
         dat.commit()
         chat.send('all proofs cleared ;)')
@@ -185,6 +195,36 @@ def changereqnum(message, chat):
             chat.send('Insert a valid number')
 
 
+@bot.command("block", hidden=True)
+def blockuser(message, chat):
+    '''command for Admins only, block an user'''
+    if chat.type == "private" and checkperm(message.sender.id):
+        bt = botogram.Buttons()
+        bt[0].callback("Cancel", "delete")
+        chat.send("Now forward a message from the user that you would like to block", attach=bt)
+        try:
+            d.execute("INSERT INTO request (userid, stage) VALUES (?, 99)", (message.sender.id, ))
+            dat.commit()
+        except sqlite3.IntegrityError:
+            d.execute("UPDATE request SET stage=99 WHERE userid=?", (message.sender.id, ))
+            dat.commit()
+
+
+@bot.command("unblock", hidden=True)
+def unblock(message, chat):
+    '''command for Admins only, unblock an user'''
+    if chat.type == "private" and checkperm(message.sender.id):
+        bt = botogram.Buttons()
+        d.execute("SELECT userid, name FROM request WHERE stage=0")
+        blocklist = d.fetchall()
+        if blocklist == []:
+            chat.send("There aren't blocked users")
+        else:
+            for index, user in enumerate(blocklist):
+                bt[index].callback(str(user[1]), "unban", str(user[0]))
+            chat.send("Who do you want to unblock?", attach=bt)
+
+
 @bot.command("oliodipalmas", hidden=True)
 def easteregg(chat, message):
     # $ Put at least one easter egg or you're dead to me
@@ -196,9 +236,12 @@ def staff(chat, message):
     '''command for Admins only, set the staff group'''
     if chat.type == "supergroup":
         if checkperm(message.sender.id):
-            d.execute("INSERT INTO ids (id, type) VALUES (?,?)", (chat.id, 1))
-            chat.send("Staff Group correctly set!")
-            dat.commit()
+            try:
+                d.execute("INSERT INTO ids (id, type) VALUES (?,?)", (chat.id, 1))
+                chat.send("Staff Group correctly set!")
+                dat.commit()
+            except sqlite3.IntegrityError:
+                chat.send("This Chat is already been used for something else")
         else:
             chat.send("I need to receive the command from an important guy, not a console peasant as you")
     else:
@@ -207,12 +250,15 @@ def staff(chat, message):
 
 @bot.command("setgroup", hidden=True)
 def setgroup(chat, message):
-    '''command for Admins only, set the group where are teh users, and the group where the requests will be voted'''
+    '''command for Admins only, set the group where are the users, and the group where the requests will be voted'''
     if chat.type == "supergroup":
         if checkperm(message.sender.id):
-            d.execute("INSERT INTO ids (id, type) VALUES (?,?)", (chat.id, 3))
-            chat.send("Group correctly set!")
-            dat.commit()
+            try:
+                d.execute("INSERT INTO ids (id, type) VALUES (?,?)", (chat.id, 3))
+                chat.send("Group correctly set!")
+                dat.commit()
+            except sqlite3.IntegrityError:
+                chat.send("This Chat is already been used for something else")
         else:
             chat.send("I need to receive the command from an important guy, not a console peasant as you")
     else:
@@ -224,9 +270,12 @@ def setilogchannel(chat, message):
     '''command for Admins only, set the log channel'''
     if chat.type == "supergroup":
         if checkperm(message.sender.id):
-            d.execute("INSERT INTO ids (id, type) VALUES (?,?)", (chat.id, 2))
-            chat.send("Log Channel correctly set!")
-            dat.commit()
+            try:
+                d.execute("INSERT INTO ids (id, type) VALUES (?,?)", (chat.id, 2))
+                chat.send("Log Channel correctly set!")
+                dat.commit()
+            except sqlite3.IntegrityError:
+                chat.send("This Chat is already been used for something else")
         else:
             chat.send("I need to receive the command from an important guy, not a console peasant as you")
     else:
@@ -238,7 +287,7 @@ def setilogchannel(chat, message):
 def first(message, chat):
     """Make Your Request!"""
     if chat.type == "private":
-        if checkreq(chat, 'request') is True:
+        if checkreq(chat, 'request'):
             bt = botogram.Buttons()
             bt[0].callback(p["request"][0], "zero")
             chat.send(p["request"][1], attach=bt)
@@ -247,7 +296,7 @@ def first(message, chat):
 @bot.command(p["values"]["request2"], hidden=False)
 def second(message, chat):
     '''Request something different'''
-    # You can have different requests, set your different type of request, or just set hidden=True if you don't want to
+    # You can have different types of request, or just set hidden=True if you don't want to use this feature
     if chat.type == "private":
         if checkreq(chat, p["values"]["request2"]) is True:
             bt = botogram.Buttons()
@@ -255,38 +304,73 @@ def second(message, chat):
             chat.send(p["request"][2], attach=bt)
 
 
+@bot.command("cancel")
+def deletemine(message, chat):
+    '''delete the request of the user'''
+    if chat.type == "private":
+        d.execute("SELECT stage FROM request WHERE userid=?", (message.sender.id, ))
+        try:
+            stage = d.fetchone()[0]
+        except TypeError:
+            chat.send(p["deletemine"][0])
+            return
+        if stage == 0:
+            return
+        elif stage < 5:
+            d.execute("DELETE FROM request WHERE userid=?", (message.sender.id, ))
+            dat.commit()
+        elif stage == 5:
+            d.execute("SELECT id FROM ids WHERE type=3")
+            group = d.fetchone()[0]
+            d.execute("SELECT mesid FROM request WHERE userid=?", (message.sender.id, ))
+            mesid = d.fetchone()[0]
+            bot.edit_message(group, mesid, "Request canceled by user")
+            d.execute("DELETE FROM request WHERE userid=?", (message.sender.id, ))
+            dat.commit()
+            d.execute("DELETE FROM mess WHERE user=?", (message.sender.id, ))
+            dat.commit()
+        elif stage > 5:
+            chat.send(p["deletemine"][1])
+            return
+        chat.send(p["deletemine"][2])
+
+
 @bot.process_message
 def stager(chat, message):
-    '''The core of this code, it just checkl at what moment the request is, and ask the specific information to the user'''
+    '''The core of this code, it just checks at what moment the request is, and ask the specific information to the user'''
     if chat.type == "private":
         d.execute("SELECT stage FROM request WHERE userid=?", (chat.id, ))
         try:
             stage = int(d.fetchone()[0])
             if stage == 1:
+                bot.edit_message(chat, int(message.message_id - 1), p["request"][1])
                 bt = botogram.Buttons()
-                chat.send(p["stager"]["1"][0])
                 d.execute("UPDATE request SET stage=2, name=? WHERE userid=?", (message.text, chat.id))
+                dat.commit()
                 bt[0].callback(p["stager"]["1"][1], "rename")
                 bt[1].callback(p["stager"]["1"][2], 'void')
                 chat.send(p["stager"]["1"][3], attach=bt)
             elif stage == 2:
                 try:
                     d.execute("SELECT link FROM request WHERE userid=?", (chat.id, ))
+                    # selection due to the fact that i use the same stager() function also in the 'No Link' event
                     if d.fetchone()[0] is None:
-                        chat.send(p["stager"]["2"][0])
                         applink = str(message.parsed_text.filter("link")[0])
                         res = checklink(applink)
+                        bot.edit_message(chat, int(message.message_id - 1), 'p["stager"]["1"][3]')
                     else:
                         applink = 'No link'
                         res = True
+                        message.edit(p["stager"]["1"][3])
+                        chat.send(p["stager"]["2"][5])
                     if res:
                         bt = botogram.Buttons()
-                        d.execute("UPDATE request SET link=?, username=?, nameuser=?, userid=?, stage=3 WHERE userid=?", (applink, (message.sender.username).lower(), message.sender.name, message.sender.id, chat.id))
+                        d.execute("UPDATE request SET link=?, username=?, nameuser=?, stage=3 WHERE userid=?", (applink, (message.sender.username).lower(), message.sender.name, chat.id))
+                        dat.commit()
                         bt[0].callback(p["stager"]["2"][1], "relink", str(message.sender.id))
                         bt[1].callback(p["stager"]["2"][2], "zero", str(message.sender.id))
                         bt[1].callback(p["stager"]["2"][3], 'confirm', str(message.sender.id))
                         chat.send(visualizer(chat), syntax="markdown", attach=bt)
-                        dat.commit()
                     else:
                         chat.send(p["stager"]["2"][4])
                 except IndexError:
@@ -299,12 +383,31 @@ def stager(chat, message):
                 chat.send(p["stager"]["5"][0])
             elif stage == 6:
                 chat.send(p["stager"]["6"][0])
+            elif stage == 0:
+                chat.send(p["stager"]["0"][0])
+            elif stage == 99:
+                blocking = message.forward_from
+                print(blocking.name)
+                try:
+                    d.execute("INSERT INTO request (userid, name, stage) VALUES (?,?,0)", (blocking.id, blocking.name))
+                    dat.commit()
+                except sqlite3.IntegrityError:
+                    d.execute("UPDATE request SET stage=0 WHERE userid=?", (blocking.id, ))
+                    dat.commit()
+                d.execute("DELETE FROM request WHERE userid=?", (message.sender.id, ))
+                dat.commit()
+                chat.send("BLOCKED, type /unblock to unblock ")
             else:
                 chat.send(p["stager"]["err"][0])
         except TypeError:
             chat.send(knowit(door))
         dat.commit()
         return True
+
+
+@bot.callback("delete")
+def dele(query):
+    query.message.delete()
 
 
 @bot.callback("rename")
@@ -361,48 +464,69 @@ def confirm(chat, message, data):
     bt[0].callback(p["confirm"][0], "refuse", str(chat.id))
     bt[1].callback(p["confirm"][1], "good", str(chat.id))
     bt[2].callback(p["confirm"][2], "vote", str(chat.id))
-    message.edit(p["confirm"][3])
     for group in staffs:
         bot.chat(group).send(staffvis(str(chat.id)), attach=bt)
+    message.edit(p["confirm"][3])
 
 
 @bot.callback("refuse")
 def refuse(chat, message, data):
     '''refuse the request'''
-    message.edit(verdict(int(data), False))
-    d.execute("DELETE FROM request WHERE userid=?", (int(data), ))
-    bot.chat(int(data)).send(p["refuse"])
-    dat.commit()
+    d.execute("SELECT stage FROM request WHERE userid=?", (int(data), ))
+    try:
+        if d.fetchone()[0] == 4:
+            d.execute("DELETE FROM request WHERE userid=?", (int(data), ))
+            bot.chat(int(data)).send(p["refuse"])
+            dat.commit()
+            message.edit(verdict(int(data), False))
+        else:
+            message.edit("Already in another Stage baby")
+    except TypeError:
+        message.edit(p["alreadydel"])
 
 
 @bot.callback("vote")
 def groupvote(chat, message, data):
     '''the request will be voted in the group'''
-    bot.chat(int(data)).send(p["vote"])
-    message.edit(verdict(int(data), 'vote'))
-    d.execute('UPDATE request SET stage=5 WHERE userid=?', (int(data), ))
-    dat.commit()
-    d.execute("SELECT id FROM ids WHERE type=3")
-    groups = d.fetchone()
-    bt = botogram.Buttons()
-    bt[0].callback('start', 'startpoll', data)
-    for group in groups:
-        bot.chat(group).send("New Poll by %s" % (data), attach=bt)
+    d.execute("SELECT stage FROM request WHERE userid=?", (int(data), ))
+    try:
+        if d.fetchone()[0] == 4:
+            bot.chat(int(data)).send(p["vote"])
+            d.execute('UPDATE request SET stage=5 WHERE userid=?', (int(data), ))
+            dat.commit()
+            d.execute("SELECT id FROM ids WHERE type=3")
+            groups = d.fetchone()
+            bt = botogram.Buttons()
+            bt[0].callback('start', 'startpoll', data)
+            for group in groups:
+                bot.chat(group).send("New Poll by %s" % (data), attach=bt)
+            message.edit(verdict(int(data), 'vote'))
+        else:
+            message.edit("Already in another Stage baby")
+    except TypeError:
+        message.edit(p["alreadydel"][0])
 
 
 @bot.callback("good")
 def good(chat, message, data):
     '''Accept the request without voting procedure'''
-    message.edit(verdict(int(data), True))
-    bot.chat(int(data)).send(p["good"][0])
-    d.execute('UPDATE request SET stage=6 WHERE userid=?', (int(data), ))
-    dat.commit()
-    d.execute("SELECT id FROM ids WHERE type=2")
-    ch = d.fetchone()
-    bt = botogram.Buttons()
-    bt[0].callback(p["good"][1], 'zero2', data)
-    for channel in ch:
-        bot.chat(channel).send(staffvis(data), attach=bt)
+    d.execute("SELECT stage FROM request WHERE userid=?", (int(data), ))
+    try:
+        if d.fetchone()[0] == 4:
+            bot.chat(int(data)).send(p["good"][0])
+            d.execute('UPDATE request SET stage=6 WHERE userid=?', (int(data), ))
+            dat.commit()
+            d.execute("SELECT id FROM ids WHERE type=2")
+            ch = d.fetchone()
+            bt = botogram.Buttons()
+            bt[0].callback(p["good"][1], 'zero2', data)
+            for channel in ch:
+                bot.chat(channel).send(staffvis(data), attach=bt)
+            message.edit(verdict(int(data), True))
+        else:
+            message.edit("Already in another Stage baby")
+    except TypeError:
+        message.edit(p["alreadydel"][0])
 
 
 @bot.callback('op')
@@ -419,12 +543,15 @@ def operation(chat, message, query, data):
             d.execute('DELETE FROM mess WHERE mesid=?', (message.message_id, ))
             good(chat, message, userid)
             message.edit(p["op"][0])
+            dat.commit()
         elif vote == -votes:
             message.edit(p["op"][1])
             zero(chat, message, userid)
             d.execute('DELETE FROM mess WHERE mesid=?', (message.message_id, ))
+            dat.commit()
         else:
             d.execute('UPDATE request SET votes=? WHERE mesid=?', (vote, message.message_id))
+            dat.commit()
             d.execute('INSERT INTO mess VALUES (?,?)', (message.message_id, query.sender.id))
             dat.commit()
             query.notify(p["op"][2])
@@ -456,6 +583,13 @@ def qtvis(chat, message, data):
     bt[0].callback('+1', 'op', str(+1))
     bt[0].callback('-1', 'op', str(-1))
     message.edit(p["qtvis"] % (ur, nameuser, userid, name, lnk, vote), preview=False, attach=bt)
+
+
+@bot.callback("unban")
+def unban(chat, message, data):
+    d.execute("DELETE FROM request WHERE userid=?", (int(data), ))
+    dat.commit()
+    message.edit("Unbanned!")
 
 
 works = os.cpu_count()
