@@ -432,11 +432,11 @@ def relink(chat, message, data):
 
 
 @bot.callback('void')
-def void(message, chat):
+def void(message, chat, query):
     '''set null link'''
     d.execute('UPDATE request SET link=? WHERE userid=?', ('NULL', chat.id))
     dat.commit()
-    stager(chat, message)
+    stager(chat, query)
 
 
 @bot.callback("zero")
