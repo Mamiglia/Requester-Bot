@@ -18,12 +18,10 @@ d = dat.cursor()
 d.execute("CREATE TABLE IF NOT EXISTS request (name TEXT, link TEXT, userid INTEGER PRIMARY KEY, username TEXT, nameuser TEXT, stage INTEGER DEFAULT 1, type TEXT, votes INTEGER DEFAULT 0, mesid INTEGER)")
 # core database of the bot, it has in it allazs the requests and useful informations
 # stage=0(ready to do a request) stage=1(just typed /request) stage=2(gave the name of the apk) stage=3(he have to confirm all) stage=4(examinating) stage=5(voting) stage=6(approved) stage=7(soddisfacted and to delete) stage=13(BANNED)
-dat.commit()
-d.execute("CREATE TABLE IF NOT EXISTS ids (id INTEGER PRIMARY KEY, type INTEGER)")
+d.execute("CREATE TABLE IF NOT EXISTS ids (id INTEGER PRIMARY KEY, username TEXT, type INTEGER)")
 # database that stores in it all the ids, the admins, the groups
 # type=0(global admin bot) type=1(staff group) type=2(log channel) type=3(public group) type=4(channel)
-dat.commit()
-d.execute('CREATE TABLE IF NOT EXISTS mess (mesid INTEGER, user INTEGER PRIMARY KEY)')
+d.execute('CREATE TABLE IF NOT EXISTS mess (mesid INTEGER, user INTEGER)')
 # database useful to check who already voted the poll
 dat.commit()
 
@@ -35,7 +33,6 @@ bot.owner = "@Mamiglia & https://github.com/Mamiglia/Requester-Bot"
 req = (input('Are requests open?[Y,N,X] ')).lower()
 if req == 'y':
     print('Ok the Bot is open to 20 requests')
-    global door
     door = 20
 elif req == 'x':
     while True:
@@ -49,9 +46,16 @@ else:
     print('the Bot isn\'t open to any request')
     door = 0
 
-global votes
 votes = 20
 # set the votes that a request needs to be approved $
+
+d.execute('SELECT username FROM ids WHERE type=2')
+try:
+    chn = d.fetchone()[0]
+    logch = botogram.channel(chn, p["values"]["token"])
+except TypeError:
+    print('ATTENTION - void log channel')
+dat.commit()
 
 
 def checkreq(cht, typ):
@@ -75,19 +79,22 @@ def checkreq(cht, typ):
 @bot.command('start')
 def start(chat, message):
     '''Say Hello to the user'''
-    chat.send(p["start"] % (message.sender.first_name))
+    if chat.type == 'private':
+        chat.send(p["start"] % (message.sender.first_name))
 
 
 @bot.command('help')
 def help(chat, message):
     '''Instructions: How do I make a request?'''
-    chat.send(p["help"])
+    if chat.type == 'private':
+        chat.send(p["help"])
 
 
 @bot.command('rules')
 def rules(chat, message):
     '''Specific rules, remember to set yours in lang.json'''
-    chat.send(p["rules"])
+    if chat.type == 'private':
+        chat.send(p["rules"])
 
 
 @bot.command("newadmin", hidden=True)
@@ -119,7 +126,8 @@ def adminhelp(message, chat):
 -/setgroup : type in your group to set it\n\
 -/setlogchannel : type in your log group to set it\n\
 -/block : block an user, first send this command, and then forward a message of the user\n\
--/unblock : a list of the blocked users, click one to unblock\n")
+-/unblock : a list of the blocked users, click one to unblock\n\
+-/turnoff : shut down the bot")
 
 
 @bot.command("delete", hidden=True)
@@ -127,6 +135,7 @@ def deletereq(message, chat):
     '''command for Admins only, delete the request of a user. Type: /delete @username'''
     if checkperm(message.sender.id):
         username = message.text[9::].lower()
+        print(username)
         d.execute("SELECT name FROM request WHERE username=?", (username, ))
         b = d.fetchone()
         if b is not None:
@@ -155,14 +164,10 @@ def cleanreq(message, chat):
     if checkperm(message.sender.id):
         chat.send('cleaning..')
         d.execute("DROP TABLE IF EXISTS request")
-        dat.commit()
         d.execute("DROP TABLE IF EXISTS mess")
-        dat.commit()
         d.execute("VACUUM")
-        dat.commit()
         d.execute("CREATE TABLE IF NOT EXISTS request (name TEXT, link TEXT, userid INTEGER PRIMARY KEY, username TEXT, nameuser TEXT, stage INTEGER DEFAULT 1, type TEXT, votes INTEGER DEFAULT 0, mesid INTEGER)")
-        dat.commit()
-        d.execute('CREATE TABLE IF NOT EXISTS mess (mesid INTEGER, user INTEGER PRIMARY KEY)')
+        d.execute('CREATE TABLE IF NOT EXISTS mess (mesid INTEGER, user INTEGER)')
         chat.send('Done!')
         dat.commit()
 
@@ -173,19 +178,22 @@ def cleanall(message, chat):
     if checkperm(message.sender.id):
         chat.send('cleaning..')
         d.execute("DROP TABLE IF EXISTS request")
-        dat.commit()
         d.execute("DROP TABLE IF EXISTS mess")
-        dat.commit()
         d.execute("DROP TABLE IF EXISTS ids")
-        dat.commit()
         d.execute("VACUUM")
         d.execute("CREATE TABLE IF NOT EXISTS request (name TEXT, link TEXT, userid INTEGER PRIMARY KEY, username TEXT, nameuser TEXT, stage INTEGER DEFAULT 1, type TEXT, votes INTEGER DEFAULT 0, mesid INTEGER)")
-        dat.commit()
-        d.execute("CREATE TABLE IF NOT EXISTS ids (id INTEGER PRIMARY KEY, type INTEGER)")
-        dat.commit()
-        d.execute('CREATE TABLE IF NOT EXISTS mess (mesid INTEGER, user INTEGER PRIMARY KEY)')
+        d.execute("CREATE TABLE IF NOT EXISTS ids (id INTEGER PRIMARY KEY, username TEXT, type INTEGER)")
+        d.execute('CREATE TABLE IF NOT EXISTS mess (mesid INTEGER, user INTEGER)')
         dat.commit()
         chat.send('all proofs cleared ;)')
+
+
+@bot.command('turnoff')
+def turnoff(chat, message):
+    if chat.type == 'private':
+        if checkperm(message.sender.id):
+            chat.send('byee')
+            os._exit(0)
 
 
 @bot.command("door", hidden=True)
@@ -197,7 +205,7 @@ def changereqnum(message, chat):
             door = int(message.text[5::])
             chat.send('Now I\'m open to %s requests' % (door))
         except ValueError:
-            chat.send('Insert a valid number')
+            chat.send('Actually still open to %s requests, Insert a valid number' % (door))
 
 
 @bot.command("block", hidden=True)
@@ -237,7 +245,7 @@ def easteregg(chat, message):
 
 
 @bot.command("setstaff", hidden=True)
-def staff(chat, message):
+def setstaff(chat, message):
     '''command for Admins only, set the staff group'''
     if chat.type == "supergroup":
         if checkperm(message.sender.id):
@@ -271,21 +279,18 @@ def setgroup(chat, message):
 
 
 @bot.command("setlogchannel", hidden=True)
-def setilogchannel(chat, message):
+def setlogchannel(chat, message):
     '''command for Admins only, set the log channel'''
-    if chat.type == "supergroup":
+    if chat.type == "private":
         if checkperm(message.sender.id):
-            try:
-                d.execute("INSERT INTO ids (id, type) VALUES (?,?)", (chat.id, 2))
-                chat.send("Log Channel correctly set!")
-                dat.commit()
-            except sqlite3.IntegrityError:
-                chat.send("This Chat is already been used for something else")
+            chn = message.text[15::]
+            d.execute("INSERT INTO ids (username, type) VALUES (?,?)", (chn, 2))
+            chat.send("Log Channel correctly set! reboot me")
+            dat.commit()
         else:
             chat.send("I need to receive the command from an important guy, not a console peasant as you")
     else:
-        chat.send("I should be in a Supergroup, wrong chat!")
-# one day this will be a Channel
+        chat.send("I should be in a private chat, wrong chat!")
 
 
 @bot.command("request")
@@ -311,7 +316,7 @@ def second(message, chat):
 
 @bot.command("cancel")
 def deletemine(message, chat):
-    '''delete the request of the user'''
+    '''self-delete the request of the user'''
     if chat.type == "private":
         d.execute("SELECT stage FROM request WHERE userid=?", (message.sender.id, ))
         try:
@@ -331,7 +336,6 @@ def deletemine(message, chat):
             mesid = d.fetchone()[0]
             bot.edit_message(group, mesid, "Request canceled by user")
             d.execute("DELETE FROM request WHERE userid=?", (message.sender.id, ))
-            dat.commit()
             d.execute("DELETE FROM mess WHERE user=?", (message.sender.id, ))
             dat.commit()
         elif stage > 5:
@@ -350,7 +354,7 @@ def stager(chat, message):
             if stage == 1:
                 bot.edit_message(chat, int(message.message_id - 1), p["request"][1])
                 bt = botogram.Buttons()
-                d.execute("UPDATE request SET stage=2, name=? WHERE userid=?", (message.text, chat.id))
+                d.execute("UPDATE request SET stage=2, name=?, username=?, nameuser=? WHERE userid=?", (message.text, (message.sender.username).lower(), message.sender.name, chat.id,))
                 dat.commit()
                 bt[0].callback(p["stager"]["1"][1], "rename")
                 bt[1].callback(p["stager"]["1"][2], 'void')
@@ -359,7 +363,8 @@ def stager(chat, message):
                 try:
                     d.execute("SELECT link FROM request WHERE userid=?", (chat.id, ))
                     # selection due to the fact that i use the same stager() function also in the 'No Link' event
-                    if d.fetchone()[0] is None:
+                    lnk = d.fetchone()[0]
+                    if lnk is None:
                         applink = str(message.parsed_text.filter("link")[0])
                         res = checklink(applink)
                         bot.edit_message(chat, int(message.message_id - 1), p["stager"]["1"][3])
@@ -370,7 +375,7 @@ def stager(chat, message):
                         chat.send(p["stager"]["2"][5])
                     if res:
                         bt = botogram.Buttons()
-                        d.execute("UPDATE request SET link=?, username=?, nameuser=?, stage=3 WHERE userid=?", (applink, (message.sender.username).lower(), message.sender.name, chat.id))
+                        d.execute("UPDATE request SET link=?, stage=3 WHERE userid=?", (applink, chat.id))
                         dat.commit()
                         bt[0].callback(p["stager"]["2"][1], "relink", str(message.sender.id))
                         bt[1].callback(p["stager"]["2"][2], "zero", str(message.sender.id))
@@ -395,10 +400,8 @@ def stager(chat, message):
                 print(blocking.name)
                 try:
                     d.execute("INSERT INTO request (userid, name, stage) VALUES (?,?,0)", (blocking.id, blocking.name))
-                    dat.commit()
                 except sqlite3.IntegrityError:
                     d.execute("UPDATE request SET stage=0 WHERE userid=?", (blocking.id, ))
-                    dat.commit()
                 d.execute("DELETE FROM request WHERE userid=?", (message.sender.id, ))
                 dat.commit()
                 chat.send("BLOCKED, type /unblock to unblock ")
@@ -436,7 +439,7 @@ def void(message, chat, query):
     '''set null link'''
     d.execute('UPDATE request SET link=? WHERE userid=?', ('NULL', chat.id))
     dat.commit()
-    stager(chat, query)
+    stager(chat, message)
 
 
 @bot.callback("zero")
@@ -521,12 +524,9 @@ def good(chat, message, data):
             bot.chat(int(data)).send(p["good"][0])
             d.execute('UPDATE request SET stage=6 WHERE userid=?', (int(data), ))
             dat.commit()
-            d.execute("SELECT id FROM ids WHERE type=2")
-            ch = d.fetchone()
             bt = botogram.Buttons()
             bt[0].callback(p["good"][1], 'zero2', data)
-            for channel in ch:
-                bot.chat(channel).send(staffvis(data), attach=bt)
+            logch.send(staffvis(data), attach=bt)
             message.edit(verdict(int(data), True))
         else:
             message.edit("Already in another Stage baby")
@@ -543,21 +543,22 @@ def operation(chat, message, query, data):
         ex = d.fetchone()
         vote = ex[0] + int(data)
         userid = ex[1]
-        # set how many votes are needed in default for the request to be approved up in line 52 $
-        if vote == votes:
+        print(query.sender.id)
+        # set how many votes are needed in default for the request to be approved up in line 52
+        print(vote, votes)
+        if vote >= votes:
             d.execute('DELETE FROM mess WHERE mesid=?', (message.message_id, ))
             good(chat, message, userid)
             message.edit(p["op"][0])
             dat.commit()
-        elif vote == -votes:
+        elif vote <= -votes:
             message.edit(p["op"][1])
             zero(chat, message, userid)
             d.execute('DELETE FROM mess WHERE mesid=?', (message.message_id, ))
             dat.commit()
         else:
             d.execute('UPDATE request SET votes=? WHERE mesid=?', (vote, message.message_id))
-            dat.commit()
-            d.execute('INSERT INTO mess VALUES (?,?)', (message.message_id, query.sender.id))
+            d.execute('INSERT INTO mess (mesid, user) VALUES (?,?)', (message.message_id, query.sender.id))
             dat.commit()
             query.notify(p["op"][2])
             qtvis(chat, message, userid)
@@ -605,4 +606,3 @@ if __name__ == "__main__":
     bot.run()
 
 # excel
-
