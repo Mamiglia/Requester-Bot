@@ -16,9 +16,11 @@ bot = botogram.create(p["values"]["token"])
 dat = sqlite3.connect('data/dat1.db')
 d = dat.cursor()
 d.execute("CREATE TABLE IF NOT EXISTS request (name TEXT, link TEXT, userid INTEGER PRIMARY KEY, username TEXT, nameuser TEXT, stage INTEGER DEFAULT 1, type TEXT, votes INTEGER DEFAULT 0, mesid INTEGER)")
+dat.commit()
 # core database of the bot, it has in it allazs the requests and useful informations
 # stage=0(ready to do a request) stage=1(just typed /request) stage=2(gave the name of the apk) stage=3(he have to confirm all) stage=4(examinating) stage=5(voting) stage=6(approved) stage=7(soddisfacted and to delete) stage=13(BANNED)
 d.execute("CREATE TABLE IF NOT EXISTS ids (id INTEGER PRIMARY KEY, username TEXT, type INTEGER)")
+dat.commit()
 # database that stores in it all the ids, the admins, the groups
 # type=0(global admin bot) type=1(staff group) type=2(log channel) type=3(public group) type=4(channel)
 d.execute('CREATE TABLE IF NOT EXISTS mess (mesid INTEGER, user INTEGER)')
@@ -66,6 +68,7 @@ def checkreq(cht, typ):
             dat.commit()
             return True
         except sqlite3.IntegrityError:
+            dat.rollback()
             d.execute("SELECT stage FROM request WHERE userid=?", (cht.id, ))
             if d.fetchone()[0] == 0:
                 cht.send(p["checkreq"][2])
@@ -107,6 +110,7 @@ def newadmin(chat, message):
             chat.send("You already know what you what to do with me, right?\nIn any case, if you don't have any idea check it here /adminhelp")
             dat.commit()
         except sqlite3.IntegrityError:
+            dat.rollback()
             chat.send("You are already an admin UwU, you can't become more admin than this")
     else:
         chat.send("Who is this CONSOLE-PEASANT??")
@@ -219,6 +223,7 @@ def blockuser(message, chat):
             d.execute("INSERT INTO request (userid, stage) VALUES (?, 99)", (message.sender.id, ))
             dat.commit()
         except sqlite3.IntegrityError:
+            dat.rollback()
             d.execute("UPDATE request SET stage=99 WHERE userid=?", (message.sender.id, ))
             dat.commit()
 
@@ -254,6 +259,7 @@ def setstaff(chat, message):
                 chat.send("Staff Group correctly set!")
                 dat.commit()
             except sqlite3.IntegrityError:
+                dat.rollback()
                 chat.send("This Chat is already been used for something else")
         else:
             chat.send("I need to receive the command from an important guy, not a console peasant as you")
@@ -271,6 +277,7 @@ def setgroup(chat, message):
                 chat.send("Group correctly set!")
                 dat.commit()
             except sqlite3.IntegrityError:
+                dat.rollback()
                 chat.send("This Chat is already been used for something else")
         else:
             chat.send("I need to receive the command from an important guy, not a console peasant as you")
@@ -384,6 +391,7 @@ def stager(chat, message):
                     else:
                         chat.send(p["stager"]["2"][4])
                 except IndexError:
+                    dat.rollback()
                     chat.send(p["stager"]["2"][4])
             elif stage == 3:
                 chat.send(p["stager"]["3"][0])
@@ -401,6 +409,7 @@ def stager(chat, message):
                 try:
                     d.execute("INSERT INTO request (userid, name, stage) VALUES (?,?,0)", (blocking.id, blocking.name))
                 except sqlite3.IntegrityError:
+                    dat.rollback()
                     d.execute("UPDATE request SET stage=0 WHERE userid=?", (blocking.id, ))
                 d.execute("DELETE FROM request WHERE userid=?", (message.sender.id, ))
                 dat.commit()
@@ -490,6 +499,7 @@ def refuse(chat, message, data):
         else:
             message.edit("Already in another Stage baby")
     except TypeError:
+        dat.rollback()
         message.edit(p["alreadydel"])
 
 
@@ -512,6 +522,7 @@ def groupvote(chat, message, data):
         else:
             message.edit("Already in another Stage baby")
     except TypeError:
+        dat.rollback()
         message.edit(p["alreadydel"])
 
 
@@ -531,6 +542,7 @@ def good(chat, message, data):
         else:
             message.edit("Already in another Stage baby")
     except TypeError:
+        dat.rollback()
         message.edit(p["alreadydel"])
 
 
