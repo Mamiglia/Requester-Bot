@@ -7,54 +7,6 @@
 import botogram
 import sqlite3
 import os
-from obj.jsonr import p
-from obj.visualizers import visualizer, staffvis, verdict
-from obj.checks import checklink, check2, knowit, checkperm
-bot = botogram.create(p["values"]["token"])
-# Set your api token in the json file (data/lang.json)$
-
-dat = sqlite3.connect('data/dat1.db')
-d = dat.cursor()
-d.execute("CREATE TABLE IF NOT EXISTS request (name TEXT, link TEXT, userid INTEGER PRIMARY KEY, username TEXT, nameuser TEXT, stage INTEGER DEFAULT 1, type TEXT, votes INTEGER DEFAULT 0, mesid INTEGER)")
-dat.commit()
-# core database of the bot, it has in it all the requests and useful informations
-# stage=0(ready to do a request) stage=1(just typed /request) stage=2(gave the name of the apk) stage=3(he have to confirm all) stage=4(examinating) stage=5(voting) stage=6(approved) stage=7(soddisfacted and to delete) stage=13(BANNED)
-d.execute("CREATE TABLE IF NOT EXISTS ids (id INTEGER PRIMARY KEY, username TEXT, type INTEGER)")
-dat.commit()
-# database that stores in it all the ids, the admins, the groups
-# type=0(global admin bot) type=1(staff group) type=2(log channel) type=3(public group)
-d.execute('CREATE TABLE IF NOT EXISTS mess (mesid INTEGER, user INTEGER)')
-# database useful to check who already voted the poll
-dat.commit()
-
-bot.owner = "@Mamiglia & https://github.com/Mamiglia/Requester-Bot"
-# Set yourself as the owner$
-
-
-class Utilities:
-    votes = 5
-    door = 20
-
-
-# For the first thing when booting up, the bot will ask you if the requests are open
-req = (input('Are requests open?[Y,N,X] ')).lower()
-if req == 'y':
-    print('Ok the Bot is open to 20 requests')
-    inf = Utilities()
-elif req == 'x':
-    while True:
-        n = input('How many requests? ')
-        try:
-            inf = Utilities(door=int(n))
-            break'''CODE UNDER APACHE 2.0 LICENSE'''
-# IMPORTANT: CHANGE ALL ELEMENTS WITH '$'
-# REMEMBER THAT YOU HAVE TO CHANGE ALSO THE JSON FILE
-# Set your password, Set your Api token
-
-
-import botogram
-import sqlite3
-import os
 import redis
 from obj.jsonr import p
 from obj.visualizers import visualizer, staffvis, verdict
