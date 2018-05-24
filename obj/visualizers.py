@@ -22,11 +22,11 @@ def staffvis(userid):
     lnk = ex[1]
     nameuser = ex[4]
     ur = ex[6]
-    tosend = (p["staffvis"][0] % (ur, nameuser, userid, name, lnk))
+    tosend = (p["staffvis"] % (ur, nameuser, userid, name, lnk))
     return tosend
 
 
-def verdict(userid, what):
+def verdict(userid, what, admin, adminid):
     '''message that will be sent to the user to let him know wheter his request has been accepted'''
     d.execute("SELECT * FROM request WHERE userid=?", (userid, ))
     ex = d.fetchone()
@@ -34,9 +34,9 @@ def verdict(userid, what):
     lnk = ex[1]
     nameuser = ex[4]
     if what is True:
-        tosend = (p["verdict"][0] % (nameuser, userid, name, lnk))
+        tosend = (p["verdict"][0] % (nameuser, userid, admin, adminid, name, lnk))
     elif what is False:
-        tosend = (p["verdict"][1] % (nameuser, userid, name, lnk))
+        tosend = (p["verdict"][1] % (nameuser, userid, admin, adminid, name, lnk))
     else:
-        tosend = (p["verdict"][2] % (nameuser, userid, name, lnk))
+        tosend = (p["verdict"][2] % (nameuser, userid, admin, adminid, name, lnk))
     return tosend
