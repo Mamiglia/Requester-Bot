@@ -1,13 +1,10 @@
 {
   "visualizer" : "Are you sure? Do you wanna request [%s](%s)?",
-  "staffvis" : [
-    "#%s\nThe user [%s](tg://user?id=%s) has requested:\n%s\n%s",
-    "#%s\nThe user @%s has requested:\n%s\n%s"
-  ],
+  "staffvis" : "#%s\nThe user [%s](tg://user?id=%s) has requested:\n%s\n%s",
   "verdict" : [
-    "The request of the user [%s](tg://user?id=%s) has been accepted:\n[%s](%s)",
-    "The request of the user [%s](tg://user?id=%s) has been refused:\n[%s](%s)",
-    "The request of the user [%s](tg://user?id=%s) is being voted:\n[%s](%s)"
+    "The request of the user [%s](tg://user?id=%s) has been ACCEPTED by [%s](tg://user?id=%s):\n[%s](%s)",
+    "The request of the user [%s](tg://user?id=%s) has been REFUSED by [%s](tg://user?id=%s):\n[%s](%s)",
+    "The request of the user [%s](tg://user?id=%s) has been sent to VOTATION by [%s](tg://user?id=%s):\n[%s](%s)"
   ],
   "knowit" : [
     "Type /request or /$request2 to start",
@@ -22,6 +19,7 @@
   "start" : "%s, Welcome to the Request Bot of @$channel, Be sure to read the rules (/rules) before requesting $something",
   "help" : "This Bot helps you to request $something to the $channel\nThese commands may help you:\n/rules - FOLLOW THE RULES\n/request - Make your Request!\n/request2 - Make a different type of request\n\nIf you have any trouble: @$yourusername & https://github.com/Mamiglia/Requester-Bot",
   "rules" : "INSERT HERE YOUR SPECIFIC RULES $$",
+  "refreshpin" : "%s [MESSAGE TO BE PINNED] %s",
   "easteregg" : "$",
   "request" : [
     "Cancel",
@@ -95,6 +93,7 @@
     "token" : "YOUR_API_KEY$$",
     "password" : "YOURPASSWORD$$",
     "link" : "https://",
-    "request2" : "Request2 type$"
+    "request2" : "Request2 type$",
+    "usernamegroup" : "$insert here the username of your public group, without @$"
   }
 }
