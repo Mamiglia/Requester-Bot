@@ -94,6 +94,8 @@
     "password" : "YOURPASSWORD$$",
     "link" : "https://",
     "request2" : "Request2 type$",
-    "usernamegroup" : "$insert here the username of your public group, without @$"
+    "usernamegroup" : "$insert here the username of your public group, without @$",
+    "redisHost" : "$$your host IP  (put localhost if needed)",
+    "redisPass" : "$ your redis's db password"
   }
 }
