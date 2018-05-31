@@ -30,6 +30,8 @@ def verdict(userid, what, admin, adminid):
     '''message that will be sent to the user to let him know wheter his request has been accepted'''
     d.execute("SELECT * FROM request WHERE userid=?", (userid, ))
     ex = d.fetchone()
+    userid = str(userid)
+    adminid = str(adminid)
     name = ex[0]
     lnk = ex[1]
     nameuser = ex[4]
