@@ -11,6 +11,7 @@ import redis
 from obj.jsonr import p
 from obj.visualizers import visualizer, staffvis, verdict
 from obj.checks import checklink, check2, knowit, checkperm
+'''Begin of starting'''
 bot = botogram.create(p["values"]["token"])
 # Set your api token in the json file (data/lang.json)$
 
@@ -27,7 +28,12 @@ dat.commit()
 d.execute('CREATE TABLE IF NOT EXISTS mess (mesid INTEGER, user INTEGER)')
 # database useful to check who already voted the poll
 dat.commit()
-r = redis.StrictRedis(host='localhost', port=6379, db=0)
+
+try:
+    r = redis.StrictRedis(host=p["values"]["redisHost"], port=6379, db=0, password=p["values"]["redisPass"], socket_connect_timeout=10)
+except redis.exceptions.TimeoutError:
+    print('WARNING - Redis not connected')
+r.ping()
 
 bot.owner = "@Mamiglia & https://github.com/Mamiglia/Requester-Bot"
 # Set yourself as the owner$
@@ -83,6 +89,7 @@ try:
         print("WARNING - void Public Group")
 except TypeError:
     print('WARNING - everything is missing!')
+'''End of Starting processes'''
 
 
 def checkreq(cht, typ):
@@ -157,7 +164,7 @@ def adminhelp(message, chat):
 -/newadmin Your_password : set you as a new admin\n\
 -/setstaff : type in the staff group to set the staff group\n\
 -/setgroup : type in your group to set it\n\
--/setlogchannel : type in your log group to set it\n\
+-/setlog : type in your log group to set it\n\
 -/block : block an user, first send this command, and then forward a message of the user\n\
 -/unblock : a list of the blocked users, click one to unblock")
 
@@ -267,7 +274,6 @@ def changereqnum(message, chat):
             chat.send('Now I\'m open to %s requests' % (int(r.get('door'))))
         except ValueError:
             chat.send('Actually still open to %s requests, Insert a valid number' % (int(r.get('door'))))
-        chat.send(str(int(r.get('votes'))))
 
 
 @bot.command("block", hidden=True)
@@ -583,20 +589,21 @@ def groupvote(chat, message, data, query):
     try:
         if x[0] == 4:
             bot.chat(int(data)).send(p["vote"])
-            d.execute('UPDATE request SET stage=5 WHERE userid=?', (int(data), ))
-            dat.commit()
-            message.edit(verdict(int(data), 'vote', query.sender.name, query.sender.id))
-            d.execute("SELECT id FROM ids WHERE type=3")
-            groups = d.fetchone()
-            bt = botogram.Buttons()
-            bt[0].callback('start', 'startpoll', data)
-            for group in groups:
-                bot.chat(group).send("New Poll by %s" % (data), attach=bt)
         else:
             message.edit("Already in another Stage baby")
-    except TypeError:
+    except TypeError as ex:
         dat.rollback()
         message.edit(p["alreadydel"])
+    else:
+        d.execute('UPDATE request SET stage=5 WHERE userid=?', (int(data), ))
+        dat.commit()
+        message.edit(verdict(int(data), 'vote', query.sender.name, query.sender.id))
+        d.execute("SELECT id FROM ids WHERE type=3")
+        groups = d.fetchone()
+        bt = botogram.Buttons()
+        bt[0].callback('start', 'startpoll', data)
+        for group in groups:
+            bot.chat(group).send("New Poll by %s" % (data), attach=bt)
 
 
 @bot.callback("good")
