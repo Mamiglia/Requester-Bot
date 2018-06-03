@@ -65,7 +65,7 @@
         "Do you feel your sins crawling on your back? You have been banned, from this bot\n__PENITENZIAGITE__"
       ]
   },
-  "rename" : "Send me the name!",
+  "rename" : "What is the name?",
   "relink" : "Send me the link!",
   "zero" : "Request cancelled",
   "zero2" : "Request Published!",
@@ -94,7 +94,6 @@
     "password" : "YOURPASSWORD$$",
     "link" : "https://",
     "request2" : "Request2 type$",
-    "usernamegroup" : "$insert here the username of your public group, without @$",
     "redisHost" : "$$your host IP  (put localhost if needed)",
     "redisPass" : "$ your redis's db password"
   }
