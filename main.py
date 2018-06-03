@@ -11,7 +11,6 @@ from obj.start import r, d, dat, logch
 from obj.jsonr import p
 from obj.visualizers import visualizer, staffvis, verdict
 from obj.checks import checklink, check2, knowit, checkperm
-'''Begin of starting'''
 bot = botogram.create(p["values"]["token"])
 # Set your api token in the json file (data/lang.json)$
 bot.owner = "@Mamiglia & https://github.com/Mamiglia/Requester-Bot"
