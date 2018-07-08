@@ -188,12 +188,223 @@ def executesql(chat, message):
             comm = message.text[9::]
             print("\nINFO - This command was executed by %s:" % (message.sender.name), comm, "\n")
             try:
+                d.execute(comm)'''CODE UNDER APACHE 2.0 LICENSE'''
+# IMPORTANT: CHANGE ALL ELEMENTS WITH '$'
+# REMEMBER THAT YOU HAVE TO CHANGE ALSO THE JSON FILE
+# Set your password, Set your Api token
+
+
+import botogram
+import sqlite3
+import os
+import time
+from obj.start import r, d, dat, logch
+from obj.jsonr import p
+from obj.visualizers import visualizer, staffvis, verdict
+from obj.checks import checklink, check2, knowit, checkperm
+bot = botogram.create(p["values"]["token"])
+# Set your api token in the json file (data/lang.json)$
+bot.owner = "@Mamiglia & https://github.com/Mamiglia/Requester-Bot"
+# Set yourself as the owner$
+
+d.execute("SELECT id FROM ids WHERE type=3")
+bot.chat(int(d.fetchone()[0])).send('Admins, press /refreshpin!')
+
+
+def checkreq(cht, typ):
+    '''Check if the user can make a request, the users can have only one request at time'''
+    if int(r.get('door')) > 0:
+        try:
+            d.execute("INSERT INTO request (userid, type) VALUES (?,?)", (cht.id, typ))
+            dat.commit()
+            return True
+        except sqlite3.IntegrityError:
+            dat.rollback()
+            d.execute("SELECT stage FROM request WHERE userid=?", (cht.id, ))
+            if d.fetchone()[0] == 0:
+                cht.send(p["checkreq"][2])
+            else:
+                cht.send(p["checkreq"][0])
+    else:
+        cht.send(p["checkreq"][1])
+    return False
+
+
+@bot.command('start')
+def start(chat, message):
+    '''Say Hello to the user'''
+    if chat.type == 'private':
+        chat.send(p["start"] % (message.sender.first_name))
+
+
+@bot.command('help')
+def help(chat):
+    '''Instructions: How do I make a request?'''
+    if chat.type == 'private':
+        chat.send(p["help"])
+
+
+@bot.command('rules')
+def rules(chat):
+    '''Specific rules, remember to set yours in lang.json'''
+    if chat.type == 'private':
+        chat.send(p["rules"])
+
+
+@bot.command("newadmin", hidden=True)
+def newadmin(chat, message):
+    '''Insert a new admin in the admins list, remember to set your password in lang.json $$'''
+    if p["values"]["password"] in message.text:
+        d.execute("SELECT id FROM ids WHERE type=0")
+        if d.fetchone() is None:
+            d.execute("INSERT INTO ids (id, type) VALUES (?,?)", (bot.itself.id, 0))
+            dat.commit()
+        try:
+            d.execute("INSERT INTO ids (id, type) VALUES (?,?)", (message.sender.id, 0))
+            chat.send("W-welcome home S-Senpai!")
+            chat.send("You already know what you what to do with me, right?\nIn any case, if you don't have any idea check it here /adminhelp")
+            dat.commit()
+        except sqlite3.IntegrityError:
+            dat.rollback()
+            chat.send("You are already an admin UwU, you can't become adminer than this")
+    else:
+        chat.send("Who is this CONSOLE-PEASANT??")
+
+
+@bot.command('adminhelp', hidden=True)
+def adminhelp(message, chat):
+    '''command only for Admins, help admins to understand what actions they can do'''
+    if checkperm(message.sender.id):
+        chat.send("These are the commands that only an admin can perform:\n\
+-/newadmin Your_password : set you as a new admin\n\
+-/refreshpin : refresh and pin the message in public group, if you reply to a message: the text of the messagge will be included in the pin\n\
+\n\
+-/door N : change the number of requests that the bot can have\n\
+-/resizevotes N : resize the number of votes that a request needs to have to be accepted\n\
+\n\
+-/setstaff : type in the staff group to set the staff group\n\
+-/setgroup : type in your group to set it\n\
+-/setlog : type in your log group to set it\n\
+\n\
+-/block : block an user, first send this command, and then forward a message of the user\n\
+-/unblock : a list of the blocked users, click one to unblock\n\
+-/delete @username: delete the user's request\n\
+\n\
+-/cleanreq : delete all the requests\n\
+-/sqldb : execute a command on the SQL tables (SQLite3)\n\
+-/backup : backup the actual requester db (SQLite3)")
+
+
+@bot.command("delete", hidden=True)
+def deletereq(message, chat):
+    '''command for Admins only, delete the request of a user. Type: /delete @username'''
+    if checkperm(message.sender.id):
+        username = message.text[9::].lower()
+        print(username)
+        d.execute("SELECT name FROM request WHERE username=?", (username, ))
+        b = d.fetchone()
+        if b is not None:
+            d.execute("DELETE FROM request WHERE username=?", (username, ))
+            dat.commit()
+            chat.send("Deleted >:c")
+        else:
+            chat.send("Invalid Username")
+
+
+@bot.command("refreshpin", hidden=True)
+def refreshpin(chat, message):
+    if message.sender in chat.admins:
+        if chat.type == 'supergroup':
+            d.execute("SELECT mesid, name FROM request WHERE stage=5")
+            reqs = d.fetchall()
+            bt = botogram.Buttons()
+            for n, x in enumerate(reqs):
+                lnk = "t.me/" + chat.username + "/" + str(x[0])
+                bt[n].url(x[1], lnk)
+            if message.sender.id != bot.itself.id:
+                try:
+                    additional_text = "\n\n_%s_\n\n" % (message.reply_to_message.text)
+                except AttributeError:
+                    additional_text = "\n"
+                tosend = (p['refreshpin'] % (additional_text))
+                chat.send(tosend, attach=bt, syntax="markdown", preview=False)
+                bot.api.call("pinChatMessage", {"chat_id": chat.id, "message_id": (message.id + 1)})
+                r.set('pinned', message.id + 1)
+            else:
+                additional_text = "\n"
+                tosend = p['refreshpin'] % (additional_text)
+                mex = r.get('pinned')
+                bot.edit_message(chat.id, mex, tosend, attach=bt, syntax="markdown", preview=False)
+
+
+@bot.command("resizevotes", hidden=True)
+def resizevotes(message, chat):
+    '''command for Admins only, resize the number of votes that a request need to be approved'''
+    if checkperm(message.sender.id):
+        try:
+            r.set('votes', int(message.text[12::]))
+            chat.send("Votes that a request needs to be approved are now %s" % (int(r.get('votes'))))
+        except ValueError:
+            chat.send("Insert a valid number!")
+
+
+@bot.command("cleanreq", hidden=True)
+def cleanreq(message, chat):
+    '''command for Admins only, clean all the requests'''
+    if checkperm(message.sender.id):
+        chat.send('cleaning..')
+        d.execute("DROP TABLE IF EXISTS request")
+        d.execute("DROP TABLE IF EXISTS mess")
+        d.execute("VACUUM")
+        d.execute("CREATE TABLE IF NOT EXISTS request (name TEXT, link TEXT, userid INTEGER PRIMARY KEY, username TEXT, nameuser TEXT, stage INTEGER DEFAULT 1, type TEXT, votes INTEGER DEFAULT 0, mesid INTEGER)")
+        d.execute('CREATE TABLE IF NOT EXISTS mess (mesid INTEGER, user INTEGER)')
+        chat.send('Done!')
+        dat.commit()
+
+
+@bot.command("cleanall", hidden=True)
+def cleanall(message, chat):
+    '''command for Admins only, clean everything (also the database with the admins and groups)'''
+    if checkperm(message.sender.id):
+        chat.send('cleaning..')
+        d.execute("DROP TABLE IF EXISTS request")
+        d.execute("DROP TABLE IF EXISTS mess")
+        d.execute("DROP TABLE IF EXISTS ids")
+        d.execute("VACUUM")
+        d.execute("CREATE TABLE IF NOT EXISTS request (name TEXT, link TEXT, userid INTEGER PRIMARY KEY, username TEXT, nameuser TEXT, stage INTEGER DEFAULT 1, type TEXT, votes INTEGER DEFAULT 0, mesid INTEGER)")
+        d.execute("CREATE TABLE IF NOT EXISTS ids (id INTEGER PRIMARY KEY, username TEXT, type INTEGER)")
+        d.execute('CREATE TABLE IF NOT EXISTS mess (mesid INTEGER, user INTEGER)')
+        dat.commit()
+        chat.send('all proofs cleared ;)')
+
+
+@bot.command('sqldb', hidden=True)
+def executesql(chat, message):
+    if chat.type == 'private':
+        if checkperm(message.sender.id):
+            comm = message.text[9::]
+            print("\nINFO - This command was executed by %s:" % (message.sender.name), comm, "\n")
+            try:
                 d.execute(comm)
                 chat.send(str(d.fetchall()))
                 dat.commit()
             except sqlite3.OperationalError:
                 dat.rollback()
                 chat.send("Can't accept this command")
+
+
+@bot.command('backup', hidden=True)
+def backup_db(chat):
+    '''command for Admins only, send the request's db to backup it'''
+    if checkperm(message.sender.id):
+        chat.send_file(path="/data/dat1.db", caption=("Backup from %s" % (time.utcnow())))
+        d.execute("SELECT count(*) FROM request")
+        active_req = d.fetchone()
+        d.execute("SELECT count(*) FROM mess")
+        being_voted = d.fetchone()
+        d.execute("SELECT count(*) FROM request WHERE stage=6")
+        to_do_reqs = d.fetchone()
+        chat.send("Active requests: %s\nBeing Voted Requests: %s\nApproved Request to do: %s" % (active_req, being_voted, to_do_reqs))
 
 
 @bot.command("door", hidden=True)
@@ -633,5 +844,3 @@ dat.commit()
 
 if __name__ == "__main__":
     bot.run()
-
-# excel
