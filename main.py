@@ -94,7 +94,7 @@ def adminhelp(message, chat):
 \n\
 -/setstaff : type in the staff group to set the staff group\n\
 -/setgroup : type in your group to set it\n\
--/setlog : type in your log group to set it\n\
+-/setlog @(your channel username): set your log channel, reboot is needed\n\
 \n\
 -/block : block an user, first send this command, and then forward a message of the user\n\
 -/unblock : a list of the blocked users, click one to unblock\n\
