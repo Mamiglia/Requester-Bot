@@ -1,4 +1,4 @@
-'''CODE UNDER APACHE 2.0 LICENSE'''
+'''LICENSED WITH APACHE 2.0'''
 # IMPORTANT: CHANGE ALL ELEMENTS WITH '$'
 # REMEMBER THAT YOU HAVE TO CHANGE ALSO THE JSON FILE
 # Set your password, Set your Api token
@@ -204,16 +204,16 @@ def executesql(chat, message):
 
 
 @bot.command('backup', hidden=True)
-def backup_db(chat):
+def backup_db(chat, message):
     '''command for Admins only, send the request's db to backup it'''
     if checkperm(message.sender.id):
-        chat.send_file(path="/data/dat1.db", caption=("Backup from %s" % (time.utcnow())))
+        chat.send_file(path="data/dat1.db", caption=("Backup from %s" % (time.ctime())))
         d.execute("SELECT count(*) FROM request")
-        active_req = d.fetchone()
+        active_req = d.fetchone()[0]
         d.execute("SELECT count(*) FROM mess")
-        being_voted = d.fetchone()
+        being_voted = d.fetchone()[0]
         d.execute("SELECT count(*) FROM request WHERE stage=6")
-        to_do_reqs = d.fetchone()
+        to_do_reqs = d.fetchone()[0]
         chat.send("Active requests: %s\nBeing Voted Requests: %s\nApproved Request to do: %s" % (active_req, being_voted, to_do_reqs))
 
 
