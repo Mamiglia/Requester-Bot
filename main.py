@@ -18,7 +18,9 @@ bot.owner = "@Mamiglia & https://github.com/Mamiglia/Requester-Bot"
 # Set yourself as the owner$
 
 d.execute("SELECT id FROM ids WHERE type=3")
-bot.chat(int(d.fetchone()[0])).send('Admins, press /refreshpin!')
+x = d.fetchone()
+if x is not None:
+    bot.chat(int(x[0])).send('Admins, press /refreshpin!')
 
 
 def checkreq(cht, typ):
@@ -498,7 +500,10 @@ def zero2(chat, message, data):
     d.execute("DELETE FROM request WHERE userid=?", (int(data), ))
     dat.commit()
     message.delete()
-    bot.chat(int(data)).send(p["zero2"])
+    try:
+        bot.chat(int(data)).send(p["zero2"])
+    except Exception:
+        pass
 
 
 @bot.callback("confirm")
@@ -525,10 +530,13 @@ def refuse(chat, message, query, data):
     d.execute("SELECT stage FROM request WHERE userid=?", (int(data), ))
     try:
         if d.fetchone()[0] == 4:
-            bot.chat(int(data)).send(p["refuse"])
             message.edit(verdict(int(data), False, query.sender.name, query.sender.id))
             d.execute("DELETE FROM request WHERE userid=?", (int(data), ))
             dat.commit()
+            try:
+                bot.chat(int(data)).send(p["refuse"])
+            except Exception:
+                pass
         else:
             message.edit("Already in another Stage baby")
     except TypeError:
@@ -543,10 +551,21 @@ def groupvote(chat, message, data, query):
     x = d.fetchone()
     try:
         if x[0] == 4:
-            bot.chat(int(data)).send(p["vote"])
+            try:
+                bot.chat(int(data)).send(p["vote"])
+            except botogram.ChatUnavailableError as e:
+                message.delete()
+                if e == "blocked":
+                    chat.send("The user has blocked the Bot. Request canceled")
+                elif e == "account_deleted":
+                    chat.send("The user deleted its account. Request canceled")
+                else:
+                    chat.send("User unavailable: %s" % (e))
+                d.execute("DELETE FROM request WHERE userid=?", (int(data), ))
+                dat.commit()
         else:
             message.edit("Already in another Stage baby")
-    except TypeError as ex:
+    except TypeError:
         dat.rollback()
         message.edit(p["alreadydel"])
     else:
@@ -566,16 +585,26 @@ def good(chat, message, data, query):
     '''Accept the request without voting procedure'''
     d.execute("SELECT stage FROM request WHERE userid=?", (int(data), ))
     try:
-        stage = d.fetchone()[0]
+        stage = int(d.fetchone()[0])
+        print(stage)
         if stage <= 5:
-            bot.chat(int(data)).send(p["good"][0])
             d.execute('UPDATE request SET stage=6 WHERE userid=?', (int(data), ))
             dat.commit()
             bt = botogram.Buttons()
             bt[0].callback(p["good"][1], 'zero2', str(data))
-            logch.send(staffvis(data), attach=bt)
             if stage == 4:
                 message.edit(verdict(int(data), True, query.sender.name, query.sender.id))
+                try:
+                    bot.chat(int(data)).send(p["good"][0])
+                except botogram.ChatUnavailableError as e:
+                    message.delete()
+                    chat.send("User unavailable: %s" % (e))
+                    d.execute("DELETE FROM request WHERE userid=?", (int(data), ))
+                    dat.commit()
+                else:
+                    logch.send(staffvis(data), attach=bt)
+            else:
+                logch.send(staffvis(data), attach=bt)
         else:
             message.edit("Already in another Stage baby")
     except TypeError:
