@@ -586,7 +586,6 @@ def good(chat, message, data, query):
     d.execute("SELECT stage FROM request WHERE userid=?", (int(data), ))
     try:
         stage = int(d.fetchone()[0])
-        print(stage)
         if stage <= 5:
             d.execute('UPDATE request SET stage=6 WHERE userid=?', (int(data), ))
             dat.commit()
