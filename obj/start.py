@@ -65,6 +65,7 @@ try:
             break
     else:
         print("WARNING - void Log Channel")
+        logch = None
     # check if there is a public group
     for x in i:
         if 3 == x[0]:
